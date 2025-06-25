@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Theme.MyCompatTheme" parent="@style/Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/main_textcolor</item>
+    </style>
+
+    <style name="PwsdkCustomTheme" parent="@style/PaymentwallSDKTheme">
+        <item name="merchantTermsUrl">https://merchant.com/terms</item>
+        <item name="merchantPrivacyUrl">https://merchant.com/privacy</item>
+    </style>
+
+
+    <style name="BaseBrightnessDialogContainer">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="BrightnessDialogContainer" parent="@style/BaseBrightnessDialogContainer" />
+
+    <style name="Animation" />
+
+
+    <!-- Standard animations for hiding and showing the status bar. -->
+    <style name="Animation.StatusBar"></style>
+
+<!--    <style name="QSBorderlessButton">-->
+<!--        <item name="android:padding">12dp</item>-->
+<!--        <item name="android:background">@drawable/btn_borderless_rect</item>-->
+<!--        <item name="android:gravity">center</item>-->
+<!--    </style>-->
+
+<!--    <style name="SearchPanelCircle">-->
+<!--        <item name="android:layout_width">match_parent</item>-->
+<!--        <item name="android:layout_height">match_parent</item>-->
+<!--    </style>-->
+
+<!--    <style name="SearchPanelScrim">-->
+<!--        <item name="android:layout_width">match_parent</item>-->
+<!--        <item name="android:layout_height">@dimen/search_panel_scrim_height</item>-->
+<!--        <item name="android:layout_gravity">bottom</item>-->
+<!--    </style>-->
+
+<!--    <style name="UserDetailView">-->
+<!--        <item name="numColumns">3</item>-->
+<!--    </style>-->
+</resources>

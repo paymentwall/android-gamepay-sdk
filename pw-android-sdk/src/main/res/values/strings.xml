@@ -1,0 +1,54 @@
+<resources>
+    <string name="confirm_payment">Confirm payment</string>
+    <string name="secured_by_pw">Secured Payment by Paymentwall © %1$s</string>
+    <!--<string name="bank_address_1">Skru012bveru nov., Skru012bveri, Daugavas iela 142-14,Latvia</string>
+    <string name="bank_address_2">Unit 701-702 7/F, 8 Jordan road, Yaumati Kowloon, Hong Kong</string>-->
+    <string name="bank_address_1"></string>
+    <string name="bank_address_2"></string>
+
+    <string name="title_local_payment">Local Payments</string>
+    <string name="title_brick">Credit/Debit Card</string>
+    <string name="title_mobiamo">SMS</string>
+    <string name="title_mint">Prepaid Card</string>
+    <string name="title_pay_alto">Local Payment Methods</string>
+
+    <string name="payment_unsuccessful">Payment unsuccessful</string>
+    <string name="payment_unsuccessful_message">Payment unsuccessful. Please try again!</string>
+    <string name="term_alert">Please accept our terms and other agreements</string>
+    <string name="issue_description">Issue Description</string>
+
+    <string name="payment_accepted">Payment accepted!</string>
+    <string name="redirecting_to">Redirecting to %1$s</string>
+
+    <string name="initialize_request">Initializing request...</string>
+    <string name="total">Total</string>
+
+    <string name="brick_hint_cardholder">Card holder name</string>
+
+    <string name="app_not_found">Incomplete transaction. Please use another payment option.</string>
+
+    <!-- GooglePay Checkout -->
+    <string name="google_pay_status_unavailable">Unfortunately, Google Pay is not available on this device.</string>
+    <string name="payments_show_name">Successfully received payment data for %s!</string>
+    <string name="gateway_replace_name_example">"Gateway name set to \"example\" - please modify Constants.java and replace it with your own gateway."</string>
+    <string name="checkout_item_description">Description</string>
+    <string name="or_pay_using">Or pay using</string>
+
+    <string name="input_card_title">Pay with your card</string>
+    <string name="select_card_title">Pay with your card</string>
+    <string name="pay_amount">Pay %s</string>
+    <string name="payment_agreement_text">
+    <![CDATA[
+    By paying you agree to %1s&#39;s
+    <a href="%2$s">Terms and Conditions</a> and
+    <a href="%3$s">Privacy Policy</a>
+    and Terminal3&#39;s
+    <a href="https://www.terminal3.com/terms-of-service">Terms of Service</a> and
+    <a href="https://www.terminal3.com/privacy-policy">Privacy Policy</a>.
+    ]]>
+</string>
+    <string name="enter_cvv_hint">CVV</string>
+    <string name="try_again_message">Please try again!</string>
+
+
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_marginTop="16dp"
+    android:layout_height="56dp"
+    android:background="@drawable/bg_secondary_stroke_button">
+
+    <ImageView
+        android:id="@+id/icMethod"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_card_new" />
+
+    <TextView
+        android:id="@+id/tvMethodName"
+        style="@style/FP.Typography"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textFontWeight="590"
+        app:layout_constraintBottom_toBottomOf="@id/icMethod"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/icMethod"
+        app:layout_constraintTop_toTopOf="@id/icMethod"
+        tools:text="Card" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

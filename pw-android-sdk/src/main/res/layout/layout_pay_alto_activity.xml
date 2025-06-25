@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout
+        android:id="@+id/pwl_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/pwl_toolbar_height"
+        android:background="?attr/mainBackground">
+
+        <ImageView
+            android:id="@+id/imgBackButton"
+            android:layout_width="@dimen/pwl_toolbar_height"
+            android:layout_height="@dimen/pwl_toolbar_height"
+            android:background="@drawable/btn_back_actionbar"
+            android:scaleType="center"
+            android:src="@drawable/ic_arrow_back_black_24dp" />
+
+        <TextView
+            android:id="@+id/tvTittle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Screen Title"/>
+    </FrameLayout>
+
+    <WebView
+        android:id="@+id/payAltoWebView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/mainBackground" />
+
+    <FrameLayout
+        android:id="@+id/frameLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/pwl_toolbar_height"
+        android:background="@color/black_transparent">
+
+        <com.paymentwall.pwunifiedsdk.payalto.ui.ProgressWheel
+            android:id="@+id/pbLoadingWheel"
+            android:layout_width="@dimen/pwl_wheel_width"
+            android:layout_height="@dimen/pwl_wheel_height"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</LinearLayout>

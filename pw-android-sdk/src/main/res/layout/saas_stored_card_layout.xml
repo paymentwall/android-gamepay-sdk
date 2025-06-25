@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutStoredCardDetail"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_secondary_stroke_button"
+    android:orientation="vertical">
+
+    <com.paymentwall.pwunifiedsdk.ui.CardEditText
+        android:id="@+id/etStoredCard"
+        style="@style/FP.Typography"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginHorizontal="16dp"
+        android:background="@null"
+        android:clickable="true"
+        android:drawableStart="@drawable/ic_master_card"
+        android:drawablePadding="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="false"
+        android:gravity="center_vertical"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/layoutCvv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="18dp"
+            android:background="@color/black_500" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/etEnterCvv"
+            style="@style/FP.Typography"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:background="@null"
+            android:hint="@string/enter_cvv_hint"
+            android:maxLength="3"
+            android:paddingVertical="24dp"
+            android:textColorHint="@color/saas_textSecondary" />
+    </LinearLayout>
+
+</LinearLayout>

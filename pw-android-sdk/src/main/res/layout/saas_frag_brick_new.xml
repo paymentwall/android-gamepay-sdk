@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootBrickLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/contentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:src="@drawable/ic_back"
+                app:tint="?attr/primaryTextColor" />
+
+            <TextView
+                android:id="@+id/tvCardPayTitle"
+                style="@style/FP.Typography"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:text="@string/input_card_title"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout xmlns:mask="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/layoutInputCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone">
+
+                <com.paymentwall.pwunifiedsdk.ui.ProximaNovaRegularEditText
+                    android:id="@+id/etEmail"
+                    style="@style/cc_form_edittext"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/email_hint"
+                    android:imeOptions="flagNoExtractUi|actionNext"
+                    android:inputType="textEmailAddress"
+                    mask:layout_constraintEnd_toEndOf="parent"
+                    mask:layout_constraintStart_toStartOf="parent"
+                    mask:layout_constraintTop_toTopOf="parent" />
+
+                <com.paymentwall.pwunifiedsdk.brick.ui.views.MaskedEditText
+                    android:id="@+id/etCardNumber"
+                    style="@style/cc_form_edittext"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="20dp"
+                    android:drawableStart="@drawable/ic_card_number"
+                    android:hint="@string/card_number_hint"
+                    android:inputType="number"
+                    mask:char_representation="c"
+                    mask:layout_constraintEnd_toEndOf="@id/etEmail"
+                    mask:layout_constraintStart_toStartOf="@id/etEmail"
+                    mask:layout_constraintTop_toBottomOf="@id/etEmail"
+                    mask:mask="cccc cccc cccc cccc" />
+
+                <ImageView
+                    android:id="@+id/imgScanCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_scan_card"
+                    mask:layout_constraintBottom_toBottomOf="@id/etCardNumber"
+                    mask:layout_constraintEnd_toEndOf="@id/etCardNumber"
+                    mask:layout_constraintTop_toTopOf="@id/etCardNumber" />
+
+                <ImageView
+                    android:id="@+id/imgMastercard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/ic_master_card"
+                    mask:layout_constraintStart_toStartOf="@id/etCardNumber"
+                    mask:layout_constraintTop_toBottomOf="@id/etCardNumber" />
+
+                <ImageView
+                    android:id="@+id/imgVisa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_visa"
+                    mask:layout_constraintStart_toEndOf="@id/imgMastercard"
+                    mask:layout_constraintTop_toTopOf="@id/imgMastercard" />
+
+                <ImageView
+                    android:id="@+id/imgAmex"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_amex"
+                    mask:layout_constraintStart_toEndOf="@id/imgVisa"
+                    mask:layout_constraintTop_toTopOf="@id/imgVisa" />
+
+                <ImageView
+                    android:id="@+id/imgJcb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:src="@drawable/ic_jcb"
+                    mask:layout_constraintStart_toEndOf="@id/imgAmex"
+                    mask:layout_constraintTop_toTopOf="@id/imgAmex" />
+
+                <com.paymentwall.pwunifiedsdk.ui.ProximaNovaRegularEditText
+                    android:id="@+id/etName"
+                    style="@style/cc_form_edittext"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="20dp"
+                    android:hint="@string/brick_hint_cardholder"
+                    android:imeOptions="flagNoExtractUi|actionNext"
+                    android:inputType="textCapCharacters"
+                    android:visibility="visible"
+                    mask:layout_constraintEnd_toEndOf="@id/etCardNumber"
+                    mask:layout_constraintStart_toStartOf="@id/etCardNumber"
+                    mask:layout_constraintTop_toBottomOf="@id/imgMastercard" />
+
+                <com.paymentwall.pwunifiedsdk.ui.ProximaNovaRegularEditText
+                    android:id="@+id/etExpireDate"
+                    style="@style/cc_form_edittext"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="8dp"
+                    android:hint="@string/exp_date_hint"
+                    android:imeOptions="actionNext"
+                    android:inputType="number"
+                    android:maxLength="5"
+                    mask:layout_constraintEnd_toStartOf="@id/etCvv"
+                    mask:layout_constraintStart_toStartOf="@id/etName"
+                    mask:layout_constraintTop_toBottomOf="@id/etName" />
+
+                <com.paymentwall.pwunifiedsdk.ui.ProximaNovaRegularEditText
+                    android:id="@+id/etCvv"
+                    style="@style/cc_form_edittext"
+                    android:layout_width="0dp"
+                    android:layout_marginStart="8dp"
+                    android:drawableEnd="@drawable/ic_cvv_card"
+                    android:hint="@string/cvv_hint"
+                    android:imeOptions="actionDone"
+                    android:inputType="number"
+                    android:maxLength="3"
+                    android:paddingEnd="12dp"
+                    mask:layout_constraintBottom_toBottomOf="@id/etExpireDate"
+                    mask:layout_constraintEnd_toEndOf="@id/etName"
+                    mask:layout_constraintStart_toEndOf="@id/etExpireDate"
+                    mask:layout_constraintTop_toTopOf="@id/etExpireDate" />
+
+                <CheckBox
+                    android:id="@+id/cbStoreCard"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:button="@drawable/check_box_selector"
+                    mask:layout_constraintBottom_toBottomOf="@id/tvStoreCard"
+                    mask:layout_constraintStart_toStartOf="@id/etExpireDate"
+                    mask:layout_constraintTop_toBottomOf="@id/etExpireDate"
+                    mask:layout_constraintTop_toTopOf="@id/tvStoreCard" />
+
+                <TextView
+                    android:id="@+id/tvStoreCard"
+                    style="@style/FP.Typography"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/store_card_confirmation"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    mask:layout_constraintStart_toEndOf="@id/cbStoreCard"
+                    mask:layout_constraintTop_toBottomOf="@id/etExpireDate" />
+
+                <com.paymentwall.pwunifiedsdk.ui.LoadingButton
+                    android:id="@+id/btnPay"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="24dp"
+                    mask:buttonText="@string/pay_amount"
+                    mask:layout_constraintEnd_toEndOf="parent"
+                    mask:layout_constraintStart_toStartOf="parent"
+                    mask:layout_constraintTop_toBottomOf="@id/tvStoreCard" />
+
+                <TextView
+                    android:id="@+id/tvAgreement"
+                    style="@style/FP.Typography"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:linksClickable="true"
+                    android:paddingBottom="48dp"
+                    android:text="@string/payment_agreement_text"
+                    android:textColor="@color/black"
+                    android:textColorLink="?attr/textColorLink"
+                    android:textSize="14sp"
+                    mask:layout_constraintEnd_toEndOf="@id/btnPay"
+                    mask:layout_constraintStart_toStartOf="@id/btnPay"
+                    mask:layout_constraintTop_toBottomOf="@id/btnPay" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/llStoredCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="48dp">
+
+                <LinearLayout
+                    android:id="@+id/llCardList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <com.paymentwall.pwunifiedsdk.ui.ProximaNovaRegularTextView
+                    android:id="@+id/etNewCard"
+                    style="@style/FP.Typography"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_secondary_stroke_button"
+                    android:clickable="true"
+                    android:drawableStart="@drawable/ic_add_card"
+                    android:drawablePadding="16dp"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/use_a_new_card"
+                    android:textFontWeight="590"
+                    android:textStyle="bold" />
+
+                <com.paymentwall.pwunifiedsdk.ui.LoadingButton
+                    android:id="@+id/btnPayStoredCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="24dp"
+                    app:buttonText="@string/pay_amount" />
+
+                <TextView
+                    android:id="@+id/tvAgreementSelectCard"
+                    style="@style/FP.Typography"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:linksClickable="true"
+                    android:paddingBottom="48dp"
+                    android:text="@string/payment_agreement_text"
+                    android:textColor="?attr/textMain"
+                    android:textColorLink="?attr/textColorLink"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
