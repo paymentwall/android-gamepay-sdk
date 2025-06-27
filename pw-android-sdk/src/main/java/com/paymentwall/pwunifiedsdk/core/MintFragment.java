@@ -6,19 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +23,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.bumptech.glide.Glide;
 import com.paymentwall.pwunifiedsdk.R;
@@ -44,6 +41,7 @@ import com.paymentwall.pwunifiedsdk.util.Key;
 import com.paymentwall.pwunifiedsdk.util.MiscUtils;
 import com.paymentwall.pwunifiedsdk.util.PwUtils;
 import com.paymentwall.pwunifiedsdk.util.ResponseCode;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 import org.json.JSONException;
 
@@ -151,7 +149,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        Log.i("ONSAVEINSTANCESTATE", "afdafs");
+        SmartLog.i("ONSAVEINSTANCESTATE", "afdafs");
         super.onSaveInstanceState(outState);
     }
 
@@ -180,9 +178,9 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
 
         if (mintCode != null) {
             fillEpin(mintCode);
-            Log.i("MINT_CODE", mintCode);
+            SmartLog.i("MINT_CODE", mintCode);
         } else {
-            Log.i("MINT_CODE", "NULL");
+            SmartLog.i("MINT_CODE", "NULL");
         }
         cbAccept.setChecked(isTermChecked);
 
@@ -312,7 +310,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                     Glide.with(self).load(request.getItemResID()).into(ivProduct);
                 } else if (request.getItemContentProvider() != null) {
                     String realPath = MiscUtils.getRealPathFromURI(Uri.parse(request.getItemContentProvider()), self);
-                    Log.i("REAL_PATH", realPath);
+                    SmartLog.i("REAL_PATH", realPath);
                     Glide.with(self).load(new File(realPath)).into(ivProduct);
                 } else {
                     ((View) (ivProduct.getParent())).setVisibility(View.GONE);
@@ -357,7 +355,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                         if (keyCode == KeyEvent.KEYCODE_DEL && edtArray[index].getSelectionStart() == 0) {
                             // Case 2. Cursor jump backward (left box is full, current box is empty)
                             // Case 3. Cursor jump backward (left box is not full)
-                            Log.d(TAG, "OnKeyListener keyCode=" + keyCode + " index=" + index + " jumpCursorToLast");
+                            SmartLog.d(TAG, "OnKeyListener keyCode=" + keyCode + " index=" + index + " jumpCursorToLast");
                             jumpCursorToLast(index - 1);
                             return true;
                         } else {
@@ -501,7 +499,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
     public void onMintSuccess(int statusCode, String body) {
         isMintError = false;
 
-        Log.i("ON_MINT_SUCCESS", "SUCCESS");
+        SmartLog.i("ON_MINT_SUCCESS", "SUCCESS");
 
         if (body != null) {
             try {
@@ -703,7 +701,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                 mintCode = edtMint1.getText().toString()
                         + edtMint2.getText().toString() + edtMint3.getText().toString()
                         + edtMint4.getText().toString();
-                Log.i("MINT_CODE_AFTER_CHANGE", mintCode);
+                SmartLog.i("MINT_CODE_AFTER_CHANGE", mintCode);
                 validateMintCode(false);
             }
         }
@@ -720,7 +718,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
 
         public void onTextChanged(MintTextChange change) {
             antiloop = true;
-            Log.i("ON_TEXT_CHANGED", change.beforeText + "---" + change.afterText + "---" + change.index);
+            SmartLog.i("ON_TEXT_CHANGED", change.beforeText + "---" + change.afterText + "---" + change.index);
             if (change.beforeText.length() < change.afterText.length() && change.afterText.length() > 4 && change.index == 3) {
                 edtArray[3].setText(change.afterText.substring(0, 4));
                 if (change.cursorPositionEnd >= 4) {
@@ -743,7 +741,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                 fillNextEditText(change.index, change.afterText.substring(4, change.afterText.length()), change.afterText.substring(change.cursorPositionEnd), change);
             }
             if (change.beforeText.length() < change.afterText.length() && change.afterText.length() >= 4 && change.afterText.length() % 4 == 0 && change.index < 3) {
-                Log.i("MOVE_CURSOR_TO_FIRST", "MOVING");
+                SmartLog.i("MOVE_CURSOR_TO_FIRST", "MOVING");
                 moveCursorTo(change.index + 1, 0);
             }
             antiloop = false;
@@ -751,7 +749,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
     }
 
     public void jumpCursorToLast(int edtIndex) {
-        //(disable log) Log.d(TAG, "jumpCursorToLast edtIndex="+edtIndex);
+        //(disable log) SmartLog.d(TAG, "jumpCursorToLast edtIndex="+edtIndex);
         if (edtIndex < 4) {
             for (int i = 0; i < edtArray.length; i++) {
                 if (i == edtIndex) {
@@ -767,7 +765,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
     }
 
     public void jumpCursorToFirst(int edtIndex) {
-        //(disable log) Log.d(TAG, "jumpCursorToFirst edtIndex="+edtIndex);
+        //(disable log) SmartLog.d(TAG, "jumpCursorToFirst edtIndex="+edtIndex);
         if (edtIndex < 4) {
             for (int i = 0; i < edtArray.length; i++) {
                 if (i == edtIndex) {
@@ -787,17 +785,17 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
 
         int finalCursorBox = 0;
         int finalCursorPosition = 0;
-        //(disable log) Log.d(TAG, "cursor calc");
+        //(disable log) SmartLog.d(TAG, "cursor calc");
         if (change.afterText.length() <= 4) {
-            //(disable log) Log.d(TAG, "cursor calc (001)");
+            //(disable log) SmartLog.d(TAG, "cursor calc (001)");
             finalCursorBox = change.index;
             finalCursorPosition = change.cursorPositionEnd;
         } else if (change.afterText.length() > (3 - change.index + 1) * 4) {
-            //(disable log) Log.d(TAG, "cursor calc (002)");
+            //(disable log) SmartLog.d(TAG, "cursor calc (002)");
             finalCursorBox = 3;
             finalCursorPosition = 4;
         } else {
-            //(disable log) Log.d(TAG, "cursor calc (003) change.cursorPositionEnd="+change.cursorPositionEnd);
+            //(disable log) SmartLog.d(TAG, "cursor calc (003) change.cursorPositionEnd="+change.cursorPositionEnd);
             int nextAllTextLength = nextAllText(change.index);
             // how many characters before cursor endpoint
             int beforeCursorCount = change.cursorPositionEnd;
@@ -807,18 +805,18 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                 finalCursorBox = change.index + (int) (beforeCursorCount / 4);
             }
             if (finalCursorBox > 3) {
-                //(disable log) Log.d(TAG, "cursor calc (013)");
+                //(disable log) SmartLog.d(TAG, "cursor calc (013)");
                 finalCursorBox = 3;
                 finalCursorPosition = 4;
             } else {
 
                 finalCursorPosition = beforeCursorCount % 4;
                 if (finalCursorPosition == 0) finalCursorPosition = 4;
-                //(disable log) Log.d(TAG, "cursor calc (023) finalCursorPosition="+finalCursorPosition+" finalCursorBox="+finalCursorBox);
+                //(disable log) SmartLog.d(TAG, "cursor calc (023) finalCursorPosition="+finalCursorPosition+" finalCursorBox="+finalCursorBox);
             }
         }
 
-        //(disable log) Log.d(TAG, "fillNextEditText currentIndex="+currentIndex+" input="+input+" position="+cursorPosition);
+        //(disable log) SmartLog.d(TAG, "fillNextEditText currentIndex="+currentIndex+" input="+input+" position="+cursorPosition);
         edtArray[currentIndex].setText(edtArray[currentIndex].getText().toString().substring(0, 4));
         if (currentIndex == 3) {
             jumpCursorToLast(3);
@@ -827,7 +825,7 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
         int backCount = 0;
         currentIndex = currentIndex + 1;
         while (currentIndex < 4 && input.length() > 0) {
-            //(disable log) Log.d(TAG, "fillNextEditText (a) currentIndex="+currentIndex+" input="+input);
+            //(disable log) SmartLog.d(TAG, "fillNextEditText (a) currentIndex="+currentIndex+" input="+input);
             if (isEditTextEmpty(currentIndex)) {
                 if (currentIndex == 3) {
                     if (input.length() > 4) {
@@ -836,28 +834,28 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() < 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (b)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (b)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() == 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (c)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (c)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else {
-                    //(disable log) Log.d(TAG, "fillNextEditText (d)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (d)");
                     edtArray[currentIndex].setText(input.substring(0, 4));
                     input = input.substring(4);
                     currentIndex = currentIndex + 1;
                 }
             } else {
                 int tempCount = input.length();
-                //(disable log) Log.d(TAG, "fillNextEditText (e1) tempCount="+tempCount);
+                //(disable log) SmartLog.d(TAG, "fillNextEditText (e1) tempCount="+tempCount);
                 backCount = backCount + edtArray[currentIndex].getText().toString().length();
                 input = input.concat(edtArray[currentIndex].getText().toString());
-                //(disable log) Log.d(TAG, "fillNextEditText (e2) currentIndex="+currentIndex);
-                //(disable log) Log.d(TAG, "fillNextEditText (e) backCount="+backCount+" input="+input);
+                //(disable log) SmartLog.d(TAG, "fillNextEditText (e2) currentIndex="+currentIndex);
+                //(disable log) SmartLog.d(TAG, "fillNextEditText (e) backCount="+backCount+" input="+input);
                 if (currentIndex == 3) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (i)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (i)");
                     if (input.length() > 4) {
                         backCount = backCount - (input.length() - 4);
                         input = input.substring(0, 4);
@@ -865,15 +863,15 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() < 4 && currentIndex < 3) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (f)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (f)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() == 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (g)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (g)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else {
-                    //(disable log) Log.d(TAG, "fillNextEditText (h)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (h)");
                     edtArray[currentIndex].setText(input.substring(0, 4));
                     input = input.substring(4);
                     jumpCursorToFirst(currentIndex + 1);
@@ -890,17 +888,17 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
         // Info: cursor position, before text, after text, index, next edittext(s)
         int finalCursorBox = 0;
         int finalCursorPosition = 0;
-        //(disable log) Log.d(TAG, "cursor calc");
+        //(disable log) SmartLog.d(TAG, "cursor calc");
         if (change.afterText.length() <= 4) {
-            //(disable log) Log.d(TAG, "cursor calc (001)");
+            //(disable log) SmartLog.d(TAG, "cursor calc (001)");
             finalCursorBox = change.index;
             finalCursorPosition = change.cursorPositionEnd;
         } else if (change.afterText.length() > (3 - change.index + 1) * 4) {
-            //(disable log) Log.d(TAG, "cursor calc (002)");
+            //(disable log) SmartLog.d(TAG, "cursor calc (002)");
             finalCursorBox = 3;
             finalCursorPosition = 4;
         } else {
-            //(disable log) Log.d(TAG, "cursor calc (003) change.cursorPositionEnd="+change.cursorPositionEnd);
+            //(disable log) SmartLog.d(TAG, "cursor calc (003) change.cursorPositionEnd="+change.cursorPositionEnd);
             int nextAllTextLength = nextAllText(change.index);
             // how many characters before cursor endpoint
             int beforeCursorCount = change.cursorPositionEnd;
@@ -910,67 +908,67 @@ public class MintFragment extends BaseFragment implements PWHttpClient.MintCallb
                 finalCursorBox = change.index + (int) (beforeCursorCount / 4);
             }
             if (finalCursorBox > 3) {
-                //(disable log) Log.d(TAG, "cursor calc (013)");
+                //(disable log) SmartLog.d(TAG, "cursor calc (013)");
                 finalCursorBox = 3;
                 finalCursorPosition = 4;
             } else {
 
                 finalCursorPosition = beforeCursorCount % 4;
                 if (finalCursorPosition == 0) finalCursorPosition = 4;
-                //(disable log) Log.d(TAG, "cursor calc (023) finalCursorPosition="+finalCursorPosition+" finalCursorBox="+finalCursorBox);
+                //(disable log) SmartLog.d(TAG, "cursor calc (023) finalCursorPosition="+finalCursorPosition+" finalCursorBox="+finalCursorBox);
             }
         }
-        //(disable log) Log.d(TAG, "fillNextEditText (001) currentIndex="+currentIndex+" input"+input+ " followingText"+followingText);
+        //(disable log) SmartLog.d(TAG, "fillNextEditText (001) currentIndex="+currentIndex+" input"+input+ " followingText"+followingText);
         edtArray[currentIndex].setText(edtArray[currentIndex].getText().toString().substring(0, 4));
         int backCount = followingText.length();
 
         currentIndex = currentIndex + 1;
         while (currentIndex < 4 && input.length() > 0) {
-            //(disable log) Log.d(TAG, "fillNextEditText (002) currentIndex="+currentIndex+" input="+input);
+            //(disable log) SmartLog.d(TAG, "fillNextEditText (002) currentIndex="+currentIndex+" input="+input);
             if (isEditTextEmpty(currentIndex)) {
-                //(disable log) Log.d(TAG, "fillNextEditText (003)");
+                //(disable log) SmartLog.d(TAG, "fillNextEditText (003)");
                 if (currentIndex == 3) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (004)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (004)");
                     if (input.length() > 4) {
                         input = input.substring(0, 4);
                     }
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() < 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (005)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (005)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() == 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (006)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (006)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else {
-                    //(disable log) Log.d(TAG, "fillNextEditText (007)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (007)");
                     edtArray[currentIndex].setText(input.substring(0, 4));
                     input = input.substring(4);
                     currentIndex = currentIndex + 1;
                 }
             } else {
-                //(disable log) Log.d(TAG, "fillNextEditText (008)");
+                //(disable log) SmartLog.d(TAG, "fillNextEditText (008)");
                 backCount = backCount + edtArray[currentIndex].getText().toString().length();
                 input = input.concat(edtArray[currentIndex].getText().toString());
                 if (currentIndex == 3) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (009)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (009)");
                     if (input.length() > 4) {
                         input = input.substring(0, 4);
                     }
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() < 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (010)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (010)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else if (input.length() == 4) {
-                    //(disable log) Log.d(TAG, "fillNextEditText (011)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (011)");
                     edtArray[currentIndex].setText(input);
                     break;
                 } else {
-                    //(disable log) Log.d(TAG, "fillNextEditText (012)");
+                    //(disable log) SmartLog.d(TAG, "fillNextEditText (012)");
                     edtArray[currentIndex].setText(input.substring(0, 4));
                     input = input.substring(4);
                     currentIndex = currentIndex + 1;

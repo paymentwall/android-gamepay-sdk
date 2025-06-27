@@ -9,7 +9,6 @@ import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -18,6 +17,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatEditText;
 
 import com.paymentwall.pwunifiedsdk.R;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 public class MaskedEditText extends AppCompatEditText implements TextWatcher {
 
@@ -282,7 +282,7 @@ public class MaskedEditText extends AppCompatEditText implements TextWatcher {
 //                    textToFill += " ";
                 }
                 setText(textToFill);
-                Log.i(this.getClass().getSimpleName(), textToFill.trim().length() + "--" + mask.length());
+                SmartLog.i(this.getClass().getSimpleName(), textToFill.trim().length() + "--" + mask.length());
                 if (textToFill.trim().length() == mask.length()) {
                     fullFillListener.onFullFill();
                 }

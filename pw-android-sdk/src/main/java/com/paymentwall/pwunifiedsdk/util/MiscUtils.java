@@ -92,7 +92,7 @@ public class MiscUtils {
                 }
                 hexString.append(hex);
             }
-            Log.i("SIGN: hash", hexString.toString());
+//            SmartLog.i("SIGN: hash", hexString.toString());
             return hexString.toString();
         }
         catch (NoSuchAlgorithmException | InvalidKeyException e) {

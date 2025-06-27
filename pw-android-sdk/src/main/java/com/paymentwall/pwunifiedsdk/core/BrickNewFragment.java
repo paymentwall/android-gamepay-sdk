@@ -21,7 +21,6 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.URLSpan;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -114,10 +113,7 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
 
                 if (intent.getExtras().containsKey(Brick.KEY_MERCHANT_SUCCESS)) {
                     int success = intent.getIntExtra(Brick.KEY_MERCHANT_SUCCESS, -1);
-                    Log.i("BRICK_RECEIVER", success + "");
-//                    if (isWaitLayoutShowing()) {
-//                        hideWaitLayout();
-//                    }
+                    SmartLog.i("BRICK_RECEIVER", success + "");
                     handler.removeCallbacks(checkTimeoutTask);
                     if (success == 1) {
                         String permanentToken = intent.getStringExtra(Brick.KEY_PERMANENT_TOKEN);
@@ -158,7 +154,7 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
                 }
             } else if (intent.getAction().equalsIgnoreCase(self.getPackageName() + Brick.BROADCAST_ERROR_SDK)) {
                 String errMessage = intent.getStringExtra(Brick.KEY_BRICK_ERROR);
-                Log.e("BRICK-ERROR", errMessage);
+                SmartLog.e("BRICK-ERROR", errMessage);
                 hideWaitLayout();
                 showErrorLayout(errMessage);
             }
@@ -171,7 +167,7 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
 
         PwUtils.logFabricCustom("Visit-BrickScreen");
 
-        Log.i("BRICK-packagename", self.getPackageName());
+        SmartLog.i("BRICK-packagename", self.getPackageName());
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(self.getPackageName() + Brick.FILTER_BACK_PRESS_FRAGMENT);
@@ -285,17 +281,6 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
         );
     }
 
-
-    private void checkScannerPlugin() {
-        try {
-//            Class<?> CardIOActivity = Class.forName("com.paymentwall.cardio.CardIOActivity");
-//            if (CardIOActivity != null)
-//                llScanCard.setVisibility(View.VISIBLE);
-        } catch (Exception e) {
-//            llScanCard.setVisibility(View.GONE);
-        }
-    }
-
     private void checkStoredCard() {
         String cards = SharedPreferenceManager.getInstance(self).getStringValue(SharedPreferenceManager.STORED_CARDS);
         SmartLog.d("TAGGGG", "CardList: " + cards);
@@ -337,34 +322,19 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
                     etCard.setTextIsSelectable(false);
                     etCard.setOnLongClickListener(v -> true);
 
-                    etCard.setDrawableClickListener(new CardEditText.DrawableClickListener() {
-                        @Override
-                        public void onClick(DrawablePosition target) {
-                            if (target == DrawablePosition.RIGHT) {
-                                if (!isWaitLayoutShowing()) showDeleteCardConfirmation(etCard);
-                            }
+                    etCard.setDrawableClickListener(target -> {
+                        if (target == CardEditText.DrawableClickListener.DrawablePosition.RIGHT) {
+                            if (!isWaitLayoutShowing()) showDeleteCardConfirmation(etCard);
                         }
                     });
 
-                    int resDrawableStart;
-
-                    switch (Const.getCardTypeFromName(cardType)) {
-                        case MASTERCARD:
-                            resDrawableStart = R.drawable.ic_master_card;
-                            break;
-                        case VISA:
-                            resDrawableStart = R.drawable.ic_visa_stored;
-                            break;
-                        case AMEX:
-                            resDrawableStart = R.drawable.ic_amex;
-                            break;
-                        case JCB:
-                            resDrawableStart = R.drawable.ic_jcb;
-                            break;
-                        default:
-                            resDrawableStart = R.drawable.ic_master_card;
-                            break;
-                    }
+                    int resDrawableStart = switch (Const.getCardTypeFromName(cardType)) {
+                        case MASTERCARD -> R.drawable.ic_master_card;
+                        case VISA -> R.drawable.ic_visa_stored;
+                        case AMEX -> R.drawable.ic_amex;
+                        case JCB -> R.drawable.ic_jcb;
+                        default -> R.drawable.ic_master_card;
+                    };
 
                     Drawable drawableStart = ResourcesCompat.getDrawable(getResources(), resDrawableStart, null);
                     Drawable drawableEnd = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_remove_card, null);
@@ -374,7 +344,7 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
                     llCardList.addView(view);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                SmartLog.e(e.getMessage());
             }
         }
     }
@@ -416,17 +386,6 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
                     }
                 });
             }
-
-//            showInputCvvDialog(clickedCard.getPermanentToken());
-        }
-    };
-
-
-    private final View.OnLongClickListener onLongClickStoredCard = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(View v) {
-            showDeleteCardConfirmation((CardEditText) v);
-            return true;
         }
     };
 
@@ -496,7 +455,6 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
         etCvv = v.findViewById(R.id.etCvv);
         etEmail = v.findViewById(R.id.etEmail);
         etNameOnCard = v.findViewById(R.id.etName);
-//        llScanCard = (LinearLayout) v.findViewById(R.id.llScanCard);
 
         llCardList = v.findViewById(R.id.llCardList);
         TextView etNewCard = v.findViewById(R.id.etNewCard);
@@ -512,63 +470,23 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
         tvCardPayTitle = v.findViewById(R.id.tvCardPayTitle);
         rootBrickLayout = v.findViewById(R.id.rootBrickLayout);
         contentLayout = v.findViewById(R.id.contentLayout);
-//        v.findViewById(R.id.llAddress).setVisibility(getMainActivity().request.isFooterEnabled() ? View.VISIBLE : View.GONE);
 
-//        tvRedirecting.setText(String.format(getString(R.string.redirecting_to), PwUtils.getApplicationName(self)));
-
-
-        etCardNumber.addOnFullFillListener(new MaskedEditText.onFullFillListener() {
-            @Override
-            public void onFullFill() {
-            }
+        btnPayStoredCard.setButtonOnClickListener(v1 -> {
+            hideKeyboard();
+            showWaitLayout();
+            Brick.getInstance().generateTokenFromPermanentToken(
+                    request.getAppKey(), permanentToken,
+                    etEnterCvvStoredCard.getText().toString().trim(),
+                    BrickNewFragment.this
+            );
         });
 
-//        llScanCard.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//                    Class<?> CardIOActivity = Class.forName("com.paymentwall.cardio.CardIOActivity");
-//                    Intent scanIntent = new Intent(self, CardIOActivity);
-//
-//                    scanIntent.putExtra("com.paymentwall.cardio.scanExpiry", true); // default: false
-//
-//                    self.startActivityForResult(scanIntent, RC_SCAN_CARD);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        btnConfirm.setButtonOnClickListener(view -> validateBrickCardInfo(true));
 
-        btnPayStoredCard.setButtonOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyboard();
-                showWaitLayout();
-                Brick.getInstance().generateTokenFromPermanentToken(
-                        request.getAppKey(), permanentToken,
-                        etEnterCvvStoredCard.getText().toString().trim(),
-                        BrickNewFragment.this
-                );
-            }
-        });
-
-        btnConfirm.setButtonOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                validateBrickCardInfo(true);
-//                showWaitLayout();
-            }
-        });
-
-
-        etNewCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isAddingNewCard = true;
-                layoutInputCard.setVisibility(View.VISIBLE);
-                layoutStoredCard.setVisibility(View.GONE);
-            }
+        etNewCard.setOnClickListener(v2 -> {
+            isAddingNewCard = true;
+            layoutInputCard.setVisibility(View.VISIBLE);
+            layoutStoredCard.setVisibility(View.GONE);
         });
 
         if (mCardNumber != null) {
@@ -593,7 +511,6 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
 
         init(v);
         initDataView();
-        checkScannerPlugin();
     }
 
 
@@ -787,13 +704,6 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
                     Method mthGetFormattedCardNumber = CreditCard.getMethod("getFormattedCardNumber");
 
                     etCardNumber.setText(mthGetFormattedCardNumber.invoke(creditCard) + "");
-//                    if (scanResult.isExpiryValid()) {
-//                        etExpirationDate.setText(scanResult.expiryMonth + "/" + scanResult.expiryYear);
-//                    }
-//
-//                    if (scanResult.cvv != null) {
-//                        etCvv.setText(scanResult.cvv);
-//                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -843,13 +753,7 @@ public class BrickNewFragment extends BaseFragment implements Brick.Callback {
             }
         });
 
-        tvNo.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        tvNo.setOnClickListener(v -> dialog.dismiss());
 
         try {
             dialog.show();

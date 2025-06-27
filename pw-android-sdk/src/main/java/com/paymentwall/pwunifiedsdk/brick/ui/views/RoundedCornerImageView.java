@@ -11,14 +11,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
+import android.util.AttributeSet;
+import android.widget.ImageView;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.DimenRes;
 import androidx.annotation.DrawableRes;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.widget.ImageView;
 
 import com.paymentwall.pwunifiedsdk.R;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 /**
  * Created by nguyen.anh on 3/16/2016.
@@ -48,7 +49,7 @@ public class RoundedCornerImageView extends ImageView {
     };
 
     private final float[] mCornerRadii =
-            new float[] { DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS };
+            new float[]{DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS, DEFAULT_RADIUS};
 
     private Drawable mBackgroundDrawable;
     private ColorStateList mBorderColor =
@@ -241,14 +242,17 @@ public class RoundedCornerImageView extends ImageView {
         }
     }
 
-    @Override public void setImageURI(Uri uri) {
+    @Override
+    public void setImageURI(Uri uri) {
         super.setImageURI(uri);
         setImageDrawable(getDrawable());
     }
 
     private Drawable resolveResource() {
         Resources rsrc = getResources();
-        if (rsrc == null) { return null; }
+        if (rsrc == null) {
+            return null;
+        }
 
         Drawable d = null;
 
@@ -256,7 +260,7 @@ public class RoundedCornerImageView extends ImageView {
             try {
                 d = rsrc.getDrawable(mResource);
             } catch (Exception e) {
-                Log.w(TAG, "Unable to find resource: " + mResource, e);
+                SmartLog.w(TAG, "Unable to find resource: " + mResource + " " + e);
                 // Don't try again.
                 mResource = 0;
             }
@@ -286,7 +290,9 @@ public class RoundedCornerImageView extends ImageView {
 
     private Drawable resolveBackgroundResource() {
         Resources rsrc = getResources();
-        if (rsrc == null) { return null; }
+        if (rsrc == null) {
+            return null;
+        }
 
         Drawable d = null;
 
@@ -294,7 +300,7 @@ public class RoundedCornerImageView extends ImageView {
             try {
                 d = rsrc.getDrawable(mBackgroundResource);
             } catch (Exception e) {
-                Log.w(TAG, "Unable to find resource: " + mBackgroundResource, e);
+                SmartLog.w(TAG, "Unable to find resource: " + mBackgroundResource + " " + e);
                 // Don't try again.
                 mBackgroundResource = 0;
             }
@@ -315,7 +321,8 @@ public class RoundedCornerImageView extends ImageView {
         }
     }
 
-    @Override public void setColorFilter(ColorFilter cf) {
+    @Override
+    public void setColorFilter(ColorFilter cf) {
         if (mColorFilter != cf) {
             mColorFilter = cf;
             mHasColorFilter = true;
@@ -341,7 +348,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     private void updateAttrs(Drawable drawable, ScaleType scaleType) {
-        if (drawable == null) { return; }
+        if (drawable == null) {
+            return;
+        }
 
         if (drawable instanceof RoundedDrawable) {
             ((RoundedDrawable) drawable)
@@ -421,7 +430,7 @@ public class RoundedCornerImageView extends ImageView {
      * Set the corner radius of a specific corner from a dimension resource id.
      *
      * @param corner the corner to set.
-     * @param resId the dimension resource id of the corner radius.
+     * @param resId  the dimension resource id of the corner radius.
      */
     public void setCornerRadiusDimen(@Corner int corner, @DimenRes int resId) {
         setCornerRadius(corner, getResources().getDimensionPixelSize(resId));
@@ -457,10 +466,10 @@ public class RoundedCornerImageView extends ImageView {
      * Set the corner radii of each corner individually. Currently only one unique nonzero value is
      * supported.
      *
-     * @param topLeft radius of the top left corner in px.
-     * @param topRight radius of the top right corner in px.
+     * @param topLeft     radius of the top left corner in px.
+     * @param topRight    radius of the top right corner in px.
      * @param bottomRight radius of the bottom right corner in px.
-     * @param bottomLeft radius of the bottom left corner in px.
+     * @param bottomLeft  radius of the bottom left corner in px.
      */
     public void setCornerRadius(float topLeft, float topRight, float bottomLeft, float bottomRight) {
         if (mCornerRadii[Corner.TOP_LEFT] == topLeft
@@ -489,7 +498,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     public void setBorderWidth(float width) {
-        if (mBorderWidth == width) { return; }
+        if (mBorderWidth == width) {
+            return;
+        }
 
         mBorderWidth = width;
         updateDrawableAttrs();
@@ -511,7 +522,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     public void setBorderColor(ColorStateList colors) {
-        if (mBorderColor.equals(colors)) { return; }
+        if (mBorderColor.equals(colors)) {
+            return;
+        }
 
         mBorderColor =
                 (colors != null) ? colors : ColorStateList.valueOf(RoundedDrawable.DEFAULT_BORDER_COLOR);
@@ -538,7 +551,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     public void setTileModeX(Shader.TileMode tileModeX) {
-        if (this.mTileModeX == tileModeX) { return; }
+        if (this.mTileModeX == tileModeX) {
+            return;
+        }
 
         this.mTileModeX = tileModeX;
         updateDrawableAttrs();
@@ -551,7 +566,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     public void setTileModeY(Shader.TileMode tileModeY) {
-        if (this.mTileModeY == tileModeY) { return; }
+        if (this.mTileModeY == tileModeY) {
+            return;
+        }
 
         this.mTileModeY = tileModeY;
         updateDrawableAttrs();
@@ -564,7 +581,9 @@ public class RoundedCornerImageView extends ImageView {
     }
 
     public void mutateBackground(boolean mutate) {
-        if (mMutateBackground == mutate) { return; }
+        if (mMutateBackground == mutate) {
+            return;
+        }
 
         mMutateBackground = mutate;
         updateBackgroundDrawableAttrs(true);

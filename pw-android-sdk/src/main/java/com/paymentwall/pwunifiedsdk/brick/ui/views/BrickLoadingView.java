@@ -110,7 +110,6 @@ public class BrickLoadingView extends View {
         r32 = currentTime >= lastTime2 ? DEFAULT_RADIUS * (float) ((Math.sin(k * (currentTime - lastTime2)) + 1) / 2) : 0;
         r33 = currentTime >= lastTime3 ? DEFAULT_RADIUS * (float) ((Math.sin(k * (currentTime - lastTime3)) + 1) / 2) : 0;
 
-//        Log.i("RADIUS", r11 + "");
         canvas.drawCircle(c11_x * w, c11_y * h, r11 * w, paintP1);
         canvas.drawCircle(c12_x * w, c12_y * h, r12 * w, paintP1);
         canvas.drawCircle(c13_x * w, c13_y * h, r13 * w, paintP1);

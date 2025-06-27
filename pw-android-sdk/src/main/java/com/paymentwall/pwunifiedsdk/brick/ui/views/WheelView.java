@@ -4,7 +4,6 @@ package com.paymentwall.pwunifiedsdk.brick.ui.views;
 import android.content.Context;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -15,6 +14,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.paymentwall.pwunifiedsdk.R;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,10 +96,7 @@ public class WheelView extends ScrollView {
     private void init(Context context) {
         this.context = context;
 
-//        scrollView = ((ScrollView)this.getParent());
-//        Log.d(TAG, "scrollview: " + scrollView);
-        Log.d(TAG, "parent: " + this.getParent());
-//        this.setOrientation(VERTICAL);
+        SmartLog.d(TAG, "parent: " + this.getParent());
         this.setVerticalScrollBarEnabled(false);
 
         views = new LinearLayout(context);
@@ -114,8 +111,6 @@ public class WheelView extends ScrollView {
                 if (initialY - newY == 0) { // stopped
                     final int remainder = initialY % itemHeight;
                     final int divided = initialY / itemHeight;
-//                    Log.d(TAG, "initialY: " + initialY);
-//                    Log.d(TAG, "remainder: " + remainder + ", divided: " + divided);
                     if (remainder == 0) {
                         selectedIndex = divided + offset;
 
@@ -183,7 +178,7 @@ public class WheelView extends ScrollView {
         tv.setPadding(padding, padding, padding, padding);
         if (0 == itemHeight) {
             itemHeight = getViewMeasuredHeight(tv);
-            Log.d(TAG, "itemHeight: " + itemHeight);
+            SmartLog.d(TAG, "itemHeight: " + itemHeight);
             views.setLayoutParams(new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, itemHeight * displayItemCount));
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) this.getLayoutParams();
             this.setLayoutParams(new LinearLayout.LayoutParams(lp.width, itemHeight * displayItemCount));
@@ -195,30 +190,10 @@ public class WheelView extends ScrollView {
     @Override
     protected void onScrollChanged(int l, int t, int oldl, int oldt) {
         super.onScrollChanged(l, t, oldl, oldt);
-
-//        Log.d(TAG, "l: " + l + ", t: " + t + ", oldl: " + oldl + ", oldt: " + oldt);
-
-//        try {
-//            Field field = ScrollView.class.getDeclaredField("mScroller");
-//            field.setAccessible(true);
-//            OverScroller mScroller = (OverScroller) field.get(this);
-//
-//
-//            if(mScroller.isFinished()){
-//                Log.d(TAG, "isFinished...");
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
         refreshItemView(t);
-
         if (t > oldt) {
-//            Log.d(TAG, "向下滚动");
             scrollDirection = SCROLL_DIRECTION_DOWN;
         } else {
-//            Log.d(TAG, "向上滚动");
             scrollDirection = SCROLL_DIRECTION_UP;
         }
     }
@@ -234,31 +209,6 @@ public class WheelView extends ScrollView {
             if (remainder > itemHeight / 2) {
                 position = divided + offset + 1;
             }
-
-//            if(remainder > itemHeight / 2){
-//                if(scrollDirection == SCROLL_DIRECTION_DOWN){
-//                    position = divided + offset;
-//                    Log.d(TAG, ">down...position: " + position);
-//                }else if(scrollDirection == SCROLL_DIRECTION_UP){
-//                    position = divided + offset + 1;
-//                    Log.d(TAG, ">up...position: " + position);
-//                }
-//            }else{
-////                position = y / itemHeight + offset;
-//                if(scrollDirection == SCROLL_DIRECTION_DOWN){
-//                    position = divided + offset;
-//                    Log.d(TAG, "<down...position: " + position);
-//                }else if(scrollDirection == SCROLL_DIRECTION_UP){
-//                    position = divided + offset + 1;
-//                    Log.d(TAG, "<up...position: " + position);
-//                }
-//            }
-//        }
-
-//        if(scrollDirection == SCROLL_DIRECTION_DOWN){
-//            position = divided + offset;
-//        }else if(scrollDirection == SCROLL_DIRECTION_UP){
-//            position = divided + offset + 1;
         }
 
         int childSize = views.getChildCount();
@@ -299,51 +249,10 @@ public class WheelView extends ScrollView {
     Paint paint;
     int viewWidth;
 
-//    @Override
-//    public void setBackgroundDrawable(Drawable background) {
-//
-//        if (viewWidth == 0) {
-//            viewWidth = ((Activity) context).getWindowManager().getDefaultDisplay().getWidth();
-//            Log.d(TAG, "viewWidth: " + viewWidth);
-//        }
-//
-//        if (null == paint) {
-//            paint = new Paint();
-//            paint.setColor(Color.parseColor("#83cde6"));
-//            paint.setStrokeWidth(dip2px(1f));
-//        }
-//
-//        background = new Drawable() {
-//            @Override
-//            public void draw(Canvas canvas) {
-//                canvas.drawLine(viewWidth * 1 / 6, obtainSelectedAreaBorder()[0], viewWidth * 5 / 6, obtainSelectedAreaBorder()[0], paint);
-//                canvas.drawLine(viewWidth * 1 / 6, obtainSelectedAreaBorder()[1], viewWidth * 5 / 6, obtainSelectedAreaBorder()[1], paint);
-//            }
-//
-//            @Override
-//            public void setAlpha(int alpha) {
-//
-//            }
-//
-//            @Override
-//            public void setColorFilter(ColorFilter cf) {
-//
-//            }
-//
-//            @Override
-//            public int getOpacity() {
-//                return 0;
-//            }
-//        };
-//
-//        super.setBackgroundDrawable(background);
-//
-//    }
-
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.d(TAG, "w: " + w + ", h: " + h + ", oldw: " + oldw + ", oldh: " + oldh);
+        SmartLog.d(TAG, "w: " + w + ", h: " + h + ", oldw: " + oldw + ", oldh: " + oldh);
         viewWidth = w;
         setBackgroundDrawable(null);
     }
@@ -389,7 +298,7 @@ public class WheelView extends ScrollView {
 
     @Override
     public void fling(int velocityY) {
-        Log.i("VELOCITY", velocityY+"");
+        SmartLog.i("VELOCITY", velocityY + "");
         super.fling(velocityY / 3);
     }
 

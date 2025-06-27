@@ -1,8 +1,6 @@
 package com.paymentwall.pwunifiedsdk.googlepay.ui;
 
-import androidx.lifecycle.AndroidViewModel;
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -15,8 +13,11 @@ import com.google.android.gms.wallet.PaymentData;
 import com.google.android.gms.wallet.PaymentDataRequest;
 import com.google.android.gms.wallet.PaymentsClient;
 import com.paymentwall.pwunifiedsdk.googlepay.core.GPayCore;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 import org.json.JSONObject;
+
+import java.util.Objects;
 
 public class GPayCheckoutViewModel extends AndroidViewModel {
     // A client for interacting with the Google Pay API.
@@ -58,7 +59,7 @@ public class GPayCheckoutViewModel extends AndroidViewModel {
                     if (completedTask.isSuccessful()) {
                         _canUseGooglePay.setValue(completedTask.getResult());
                     } else {
-                        Log.w("isReadyToPay failed", completedTask.getException());
+                        SmartLog.w("isReadyToPay failed", Objects.requireNonNull(completedTask.getException()).getMessage());
                         _canUseGooglePay.setValue(false);
                     }
                 });
@@ -75,7 +76,7 @@ public class GPayCheckoutViewModel extends AndroidViewModel {
         if (paymentDataRequestJson == null) {
             return null;
         }
-        Log.d("GPay: paymentDataRequestJson", paymentDataRequestJson.toString());
+        SmartLog.d("GPay: paymentDataRequestJson", paymentDataRequestJson.toString());
 
         PaymentDataRequest request =
                 PaymentDataRequest.fromJson(paymentDataRequestJson.toString());

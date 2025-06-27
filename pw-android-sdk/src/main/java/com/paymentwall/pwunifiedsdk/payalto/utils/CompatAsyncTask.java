@@ -8,6 +8,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -243,7 +245,7 @@ abstract class CompatAsyncTask<Params, Progress, Result> {
 
                     postResultIfNotInvoked(result);
                 } catch (InterruptedException e) {
-                    android.util.Log.w(LOG_TAG, e);
+                    SmartLog.w(LOG_TAG, e.getMessage());
                 } catch (ExecutionException e) {
                     throw new RuntimeException("An error occured while executing doInBackground()",
                             e.getCause());

@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +23,6 @@ import androidx.transition.AutoTransition;
 import androidx.transition.TransitionManager;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wallet.PaymentData;
 import com.google.android.gms.wallet.button.ButtonOptions;
@@ -140,8 +137,6 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
     private void setFonts(View v) {
         PwUtils.setFontLight(self, v.findViewById(R.id.tvCopyRight));
         PwUtils.setFontRegular(self, v.findViewById(R.id.tvProduct), v.findViewById(R.id.tvTotal), v.findViewById(R.id.tvPrice));
-
-        PwUtils.setFontRegular(self, v.findViewById(R.id.tvBrick), v.findViewById(R.id.tvLocalPs), v.findViewById(R.id.tvMint), v.findViewById(R.id.tvMobiamo), v.findViewById(R.id.tvPwLocal));
     }
 
     private void bindView(View v) {
@@ -221,6 +216,7 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
 
     // Track API calls to know when to hide loading
     final AtomicInteger pendingApiCalls = new AtomicInteger(0);
+
     private void init() {
         initGooglePay();
         initPayAlto();
@@ -248,16 +244,10 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
     }
 
     private void payWithMobiamo() {
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable(Const.KEY.REQUEST_MESSAGE, request.getMobiamoRequest());
-//        getMainActivity().replaceContentFragment(new MobiamoFragment(), bundle);
-
         Intent intent = new Intent(self, MobiamoDialogActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         intent.putExtra(Const.KEY.REQUEST_MESSAGE, request.getMobiamoRequest());
         startActivityForResult(intent, MobiamoDialogActivity.MOBIAMO_REQUEST_CODE);
     }
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -330,7 +320,6 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
 
     @Override
     public void showWaitLayout() {
-//        super.showWaitLayout();
         layoutProgressBar.setVisibility(View.VISIBLE);
         rcvAnotherMethods.setVisibility(View.GONE);
         TransitionManager.beginDelayedTransition(_mainViewGroup, new AutoTransition());
@@ -338,7 +327,6 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
 
     @Override
     public void hideWaitLayout() {
-//        super.hideWaitLayout();
         layoutProgressBar.setVisibility(View.GONE);
         rcvAnotherMethods.setVisibility(View.VISIBLE);
         TransitionManager.beginDelayedTransition(_mainViewGroup, new AutoTransition());
@@ -358,7 +346,6 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
             listPaymentMethods = new ArrayList<>();
             if (request.isBrickEnabled() && request.getBrickRequest().validate()) {
                 listPaymentMethods.add(generateCardMethod());
-//                setRecyclerView(Collections.singletonList(generateCardMethod()), true);
             }
             if (request.isPayAltoEnabled()) {
                 PayAltoCore.getInstance().setContext(getActivity());
@@ -368,14 +355,13 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
                     CustomRequest payAltoRequest = (CustomRequest) request.getPayAltoRequest();
                     countryCode = payAltoRequest.get(com.paymentwall.pwunifiedsdk.payalto.utils.Const.P.COUNTRY_CODE);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    SmartLog.e(e.getMessage());
                 }
 
                 pendingApiCalls.incrementAndGet();
                 PayAltoCore.getInstance().getPaymentSystems(
                         new PayAltoCore.PaymentSystemsRequest(request.getPwProjectKey(), countryCode), this);
             } else {
-//                hideWaitLayout();
                 finalizeInitialization();
             }
         }
@@ -385,24 +371,15 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
     @Override
     public void onPaymentSystemsSuccess(List<PayAltoCore.PayAltoMethod> payAltoMethods) {
         listPaymentMethods.addAll(payAltoMethods);
-//        listPaymentMethods = payAltoMethods;
         finalizeInitialization();
-//        hideWaitLayout();
     }
 
     @Override
     public void onPayAltoError(PayAltoCore.PayAltoError error) {
-        Log.i("PayAltoError", error.getMessage());
+        SmartLog.i("PayAltoError", error.getMessage());
         finalizeInitialization();
-//        hideWaitLayout();
-//        Toast.makeText(this.getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
-//        Intent intent = new Intent();
-//        self.setResult(ResponseCode.ERROR, intent);
-//        self.finish();
     }
-
     // endregion
-
 
     //#region Google Pay integration
     private GPayCheckoutViewModel gPayViewModel;
@@ -467,7 +444,7 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
                 );
                 payButton.setOnClickListener(this::requestPayment);
             } catch (JSONException e) {
-                e.printStackTrace();
+                SmartLog.e(e.getMessage());
                 // Keep Google Pay button hidden (consider logging this to your app analytics service)
             }
             payButton.setVisibility(View.VISIBLE);
@@ -490,34 +467,14 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
     }
 
     public void requestPayment(View view) {
-//        String uid, String email, double amount, String currency,
-//                String ps, String merchantOrderId, String key
-
         showWaitLayout();
-        if (isMerchantHandleGooglePayToken) {
-            // The price provided to the API should include taxes and shipping.
-            processGooglePayPayment();
-        } else {
-            processGooglePayPayment();
-            // Create click ID
-//            GPayCore.getInstance().getGooglePayInstruction(new GPayCore.GPayClickRequest(
-//                    request.getUserId(),
-//                    "t_email@gmail.com",
-//                    request.getAmount(),
-//                    request.getCurrency(),
-//                    "gpay",
-//                    "ref8888",
-//                    request.getPwProjectKey(),
-//                    request.getPwSecretKey()
-//            ), this);
-        }
+        processGooglePayPayment();
     }
 
     @Override
     public void onClickIdSuccess(String clickId) {
-        Log.i("Click ID", clickId);
+        SmartLog.i("Click ID", clickId);
         checkGooglePayAvailability();
-//        processGooglePayPayment();
     }
 
     private void processGooglePayPayment() {
@@ -546,14 +503,7 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
             // If the gateway is set to "example", no payment information is returned - instead, the
             // token will only consist of "examplePaymentMethodToken".
 
-//            final JSONObject info = paymentMethodData.getJSONObject("info");
-//            final String billingName = info.getJSONObject("billingAddress").getString("name");
-//            Toast.makeText(
-//                    requireContext(), getString(R.string.payments_show_name, billingName),
-//                    Toast.LENGTH_LONG).show();
-
-            // Logging token string.
-            Log.d("Google Pay token", paymentMethodData
+            SmartLog.d("Google Pay token", paymentMethodData
                     .getJSONObject("tokenizationData")
                     .getString("token"));
 
@@ -577,14 +527,10 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
                     request.getUserEmail()
             );
             GPayCore.getInstance().processGPayPayment(gRequest, this);
-//            startActivity(new Intent(requireContext(), CheckoutSuccessActivity.class));
-//            self.setResult(ResponseCode.SUCCESSFUL, new Intent());
-//            self.finish();
 
         } catch (JSONException e) {
             onGooglePayError(GPayCore.GPayRequestType.PAYMENT, new GPayCore.GooglePayError(e.getMessage(), GPayCore.GooglePayError.Kind.UNEXPECTED));
-//            hideWaitLayout();
-//            Log.e("handlePaymentSuccess", "Error: " + e);
+            SmartLog.e("Error: " + e.getMessage());
         }
     }
 
@@ -595,29 +541,15 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
         intent.putExtra("result", result);
         self.setResult(ResponseCode.SUCCESSFUL, intent);
         self.finish();
-        //        Log.e("GPayProcess Result", result);
-//        Toast.makeText(self, "Success", Toast.LENGTH_SHORT).show();
     }
-
-//    @Override
-//    public void onGooglePayError(GPayCore.GooglePayError error) {
-//        hideWaitLayout();
-//        Log.e("GPayProcess Error", error.toString());
-//        Intent intent = new Intent();
-//        intent.putExtra("error", error.getMessage());
-//        self.setResult(ResponseCode.ERROR, intent);
-//        self.finish();
-////        Toast.makeText(self, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-//    }
 
     @Override
     public void onGooglePayError(GPayCore.GPayRequestType type, GPayCore.GooglePayError error) {
+        SmartLog.e(GPayCore.TAG, error.getMessage());
         if (type == GPayCore.GPayRequestType.INSTRUCTION) {
             gPayViewModel.setCanUseGooglePay(false);
             finalizeInitialization();
-        }
-        else {
-            Log.e("GPayProcess Error", error.toString());
+        } else {
             Intent intent = new Intent();
             intent.putExtra("error", error.getMessage());
             self.setResult(ResponseCode.ERROR, intent);
@@ -627,7 +559,7 @@ public class MainFragment extends BaseFragment implements GPayCore.PaymentCallba
 
     private void handleError(int statusCode, @Nullable String message) {
         showErrorLayout(message);
-        Log.e("loadPaymentData failed",
+        SmartLog.e("loadPaymentData failed",
                 String.format(Locale.getDefault(), "Error code: %d, Message: %s", statusCode, message));
     }
     //#endregion

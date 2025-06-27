@@ -3,33 +3,29 @@ package com.terminal3.gamepaysdk
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.paymentwall.pwunifiedsdk.brick.core.Brick
+import com.paymentwall.pwunifiedsdk.brick.core.BrickHelper
+import com.paymentwall.pwunifiedsdk.util.SmartLog
+import com.terminal3.gamepaysdk.config.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import com.paymentwall.pwunifiedsdk.brick.core.Brick
-import com.paymentwall.pwunifiedsdk.brick.core.BrickHelper
-import com.paymentwall.pwunifiedsdk.util.ResponseCode
-import com.terminal3.gamepaysdk.config.Constants
 import org.json.JSONObject
-import java.io.*
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.ProtocolException
 import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.security.Security
-import java.security.cert.Certificate
 import java.security.cert.CertificateEncodingException
-import java.util.*
+import java.util.Arrays
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLPeerUnverifiedException
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 
 // Sealed class to represent different payment states
@@ -92,11 +88,11 @@ class MainActivityViewModel : ViewModel() {
 
             // Connect
             val conn = createPostRequest(URL(Constants.MERCHANT_CHARGE_ENDPOINT), queryUrl, 30000, 30000)
-            Log.i("START CONNECT", queryUrl)
+            SmartLog.i("START CONNECT", queryUrl)
 
             // Get message
             val response = getResponseBody(conn.inputStream)
-            Log.i("RESPONSE", response)
+            SmartLog.i("RESPONSE", response)
             val jsonObject = JSONObject(response)
 
             when {
@@ -123,7 +119,7 @@ class MainActivityViewModel : ViewModel() {
 
         } catch (e: Exception) {
             Brick.getInstance().setError(e.message ?: "Payment processing failed")
-            Log.e("BrickViewModel", "Payment error", e)
+            SmartLog.e("BrickViewModel", e.message)
         } finally {
             if (allowedToSetTTL) {
                 if (originalDNSCacheTTL == null) {

@@ -4,10 +4,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.paymentwall.pwunifiedsdk.core.PWEnv;
 import com.paymentwall.pwunifiedsdk.object.ExternalPs;
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -133,12 +133,12 @@ public class PayAltoCore {
         try {
             // Build URL with key parameter
             String urlString = PAYMENT_SYSTEMS_BASE_URL + "?key=" + key;
-            if (countryCode!= null && !countryCode.isBlank()) {
+            if (countryCode != null && !countryCode.isBlank()) {
                 urlString += "&country_code=" + countryCode;
             }
             URL url = new URL(urlString);
 
-            Log.d(TAG, "Making API request to: " + urlString);
+//            SmartLog.d(TAG, "Making API request to: " + urlString);
 
             // Create connection
             connection = (HttpURLConnection) url.openConnection();
@@ -150,7 +150,7 @@ public class PayAltoCore {
 
             // Check response code
             int responseCode = connection.getResponseCode();
-            Log.d(TAG, "API response code: " + responseCode);
+            SmartLog.d(TAG, "API response code: " + responseCode);
 
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 String errorMessage = "HTTP error: " + responseCode;
@@ -175,19 +175,19 @@ public class PayAltoCore {
             }
 
             String jsonResponse = response.toString();
-            Log.d(TAG, "API response received, length: " + jsonResponse.length());
+            SmartLog.d(TAG, "API response received, length: " + jsonResponse.length());
 
             // Parse JSON response
             return parsePaymentMethods(jsonResponse);
 
         } catch (IOException e) {
-            Log.e(TAG, "Network error: " + e.getMessage());
+            SmartLog.e(TAG, "Network error: " + e.getMessage());
             throw new PayAltoError("Network error: " + e.getMessage(), PayAltoError.Kind.NETWORK);
         } catch (JSONException e) {
-            Log.e(TAG, "JSON parsing error: " + e.getMessage());
+            SmartLog.e(TAG, "JSON parsing error: " + e.getMessage());
             throw new PayAltoError("Failed to parse payment systems data", PayAltoError.Kind.API_ERROR);
         } catch (Exception e) {
-            Log.e(TAG, "Unexpected error: " + e.getMessage());
+            SmartLog.e(TAG, "Unexpected error: " + e.getMessage());
             throw new PayAltoError(e.getMessage(), PayAltoError.Kind.UNEXPECTED);
         } finally {
             // Clean up resources
@@ -195,7 +195,7 @@ public class PayAltoCore {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    Log.w(TAG, "Error closing reader: " + e.getMessage());
+                    SmartLog.w(TAG, "Error closing reader: " + e.getMessage());
                 }
             }
             if (connection != null) {
@@ -214,7 +214,7 @@ public class PayAltoCore {
             payAltoMethods.add(payAltoMethod);
         }
 
-        Log.d(TAG, "Successfully parsed " + payAltoMethods.size() + " payment methods");
+        SmartLog.d(TAG, "Successfully parsed " + payAltoMethods.size() + " payment methods");
         return payAltoMethods;
     }
 
@@ -266,7 +266,7 @@ public class PayAltoCore {
             externalPsList.add(externalPs);
         }
 
-        Log.d(TAG, "Transformed " + payAltoMethods.size() + " PaymentMethods to ExternalPs objects");
+        SmartLog.d(TAG, "Transformed " + payAltoMethods.size() + " PaymentMethods to ExternalPs objects");
         return externalPsList;
     }
 

@@ -16,7 +16,7 @@ import android.util.Log;
  * @author nguyen.anh
  */
 public final class SmartLog {
-    public static final boolean DEBUG = true;
+    public static boolean DEBUG = false;
     private static String TAG = "PaymentwallSdk";
 
     private SmartLog() {

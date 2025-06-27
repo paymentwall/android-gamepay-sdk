@@ -22,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Parcelable;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.webkit.CookieManager;
@@ -88,12 +87,7 @@ public class PayAltoActivity extends FragmentActivity implements
         progressWheelContainer = findViewById(R.id.frameLoading);
         progressWheel.setCircleRadius(getResources().getDimensionPixelSize(R.dimen.pwl_wheel_radius));
         progressWheel.setBarWidth(getResources().getDimensionPixelSize(R.dimen.pwl_wheel_bar_width));
-        backbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        backbutton.setOnClickListener(v -> onBackPressed());
         initWebView();
         acquireMessage();
     }
@@ -134,13 +128,10 @@ public class PayAltoActivity extends FragmentActivity implements
                 String customRequestType = extras.getString(Key.CUSTOM_REQUEST_TYPE);
                 String rootUrl;
                 if (customRequestType.equals(ApiType.VIRTUAL_CURRENCY)) {
-                    rootUrl = Const.PW_URL.PS;
                     rootUrl = PayAltoCore.PAY_ALTO_PS;
                 } else if (customRequestType.equals(ApiType.CART)) {
-                    rootUrl = Const.PW_URL.CART;
                     rootUrl = PayAltoCore.PAY_ALTO_CART;
                 } else if (customRequestType.equals(ApiType.DIGITAL_GOODS)) {
-                    rootUrl = Const.PW_URL.SUBSCRIPTION;
                     rootUrl = PayAltoCore.PAY_ALTO_SUBSCRIPTION;
                 } else {
                     Intent result = new Intent();
@@ -153,8 +144,6 @@ public class PayAltoActivity extends FragmentActivity implements
                 url = rootUrl + query;
                 SmartLog.d("Query: " + query);
                 SmartLog.d("URL: " + url);
-//                url = "https://api.paymentwall.com/v1/checkout/orders/?key=02e68a437754e67f46269bd6597ef5ba&uid=saulnara0916&widget=pw_7&amount=5&currencyCode=USD&ag_name=Test+Product&ag_type=fixed&ag_external_id=1&country_code=VN&ps=banktransfervn&sign_version=2&sign=8aa06558d9f7b48f4aa7e9a0230ae9f5";
-//                url = "https://api.paymentwall.com/v1/checkout/orders/?key=02e68a437754e67f46269bd6597ef5ba&uid=saulnara0916&widget=pw_7&amount=5&currencyCode=USD&ag_name=Test+Product&ag_type=fixed&ag_external_id=1&country_code=VN&sign_version=2&sign=61632b07308e7fc713f729db39bc8421";
                 if (webView != null) {
                     if (customParameters.getMobileDownloadLink() != null)
                         extraHeaders.put(Const.P.HISTORY_MOBILE_DOWNLOAD_LINK, customParameters.getMobileDownloadLink());
@@ -222,7 +211,6 @@ public class PayAltoActivity extends FragmentActivity implements
     }
 
     private void successRespond(Intent intent) {
-//        SmartLog.i("successRespond");
         if (message != null) {
             intent.putExtra(Key.PAY_ALTO_REQUEST_MESSAGE, (Parcelable) message);
         } else if (customParameters != null) {
@@ -295,13 +283,6 @@ public class PayAltoActivity extends FragmentActivity implements
         finish();
     }
 
-
-    @Override
-    public void onBackPressed() {
-//        cancelRespond();
-        super.onBackPressed();
-    }
-
     public static Map<String, String> getAppParametersFull(Context context) {
         TreeMap<String, String> headers = new TreeMap<>();
         try {
@@ -342,7 +323,7 @@ public class PayAltoActivity extends FragmentActivity implements
         if (webView == null) return;
         String currentAgent = webView.getSettings().getUserAgentString();
         String appAgent = currentAgent + "{" + Const.USER_AGENT_VERSION + "}";
-        Log.e("User_agent", appAgent);
+        SmartLog.e("User_agent", appAgent);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setSupportMultipleWindows(true);
@@ -444,7 +425,6 @@ public class PayAltoActivity extends FragmentActivity implements
         if (MiscUtils.isSuccessfulUrl(url, successfulUrl)) {
             onPayAltoCallback();
         } else if (shouldOpenInApp(url)) {
-//            webView.loadUrl(url);
         } else {
             try {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -468,14 +448,6 @@ public class PayAltoActivity extends FragmentActivity implements
 
     @Override
     public void onReceivedWebViewError(String failingUrl) {
-        if (MiscUtils.isFasterpayLink(failingUrl)) {
-        }
-//        if (!MiscUtils.isSuccessfulUrl(failingUrl, successfulUrl)) {
-//            Toast.makeText(PayAltoActivity.this, getString(R.string.check_internet_connection), Toast.LENGTH_LONG).show();
-//            Intent intent = new Intent();
-//            intent.putExtra(Key.SDK_ERROR_MESSAGE, "CONNECTION ERROR");
-//            errorRespond(intent);
-//        }
     }
 
     @Override

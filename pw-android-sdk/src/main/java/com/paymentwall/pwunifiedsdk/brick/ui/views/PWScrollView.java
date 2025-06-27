@@ -65,7 +65,6 @@ public class PWScrollView extends ScrollView {
         } else {
             needToScrollToCenter = false;
         }
-//        Log.d(TAG, "ah="+heightAfter+" aw="+widthAfter+" bh="+heightBefore+" bw="+widthBefore);
 
     }
 

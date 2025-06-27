@@ -4,46 +4,53 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.icu.util.Currency
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.paymentwall.pwunifiedsdk.brick.core.Brick
 import com.paymentwall.pwunifiedsdk.core.PaymentSelectionActivity
 import com.paymentwall.pwunifiedsdk.core.UnifiedRequest
 import com.paymentwall.pwunifiedsdk.payalto.utils.Const
 import com.paymentwall.pwunifiedsdk.payalto.utils.Key
 import com.paymentwall.pwunifiedsdk.payalto.utils.ResponseCode
+import com.paymentwall.pwunifiedsdk.util.SmartLog
 import com.terminal3.gamepaysdk.config.Constants
 import com.terminal3.gamepaysdk.ui.theme.T3GamePaySDKTheme
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.paymentwall.pwunifiedsdk.brick.core.Brick
-import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -59,8 +66,15 @@ class MainActivity : ComponentActivity() {
     // BroadcastReceiver to handle Brick SDK callbacks
     private val brickReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action?.equals(packageName + Brick.BROADCAST_FILTER_MERCHANT, ignoreCase = true) == true) {
-                Log.i(this@MainActivity::class.java.simpleName, intent.getStringExtra(Brick.KEY_BRICK_TOKEN) ?: "")
+            if (intent.action?.equals(
+                    packageName + Brick.BROADCAST_FILTER_MERCHANT,
+                    ignoreCase = true
+                ) == true
+            ) {
+                SmartLog.i(
+                    this@MainActivity::class.java.simpleName,
+                    intent.getStringExtra(Brick.KEY_BRICK_TOKEN) ?: ""
+                )
 
                 val email = intent.getStringExtra(Brick.KEY_BRICK_EMAIL) ?: ""
                 val token = intent.getStringExtra(Brick.KEY_BRICK_TOKEN) ?: ""
@@ -69,8 +83,11 @@ class MainActivity : ComponentActivity() {
                 if (token.isNotEmpty() && email.isNotEmpty()) {
                     processPayment(token, email)
                 } else {
-                    Log.e("MainActivity", "Invalid token or email received from broadcast")
-                    Toast.makeText(this@MainActivity, "Invalid payment data received", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Invalid payment data received",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -106,16 +123,16 @@ class MainActivity : ComponentActivity() {
         val filter = IntentFilter(packageName + Brick.BROADCAST_FILTER_MERCHANT)
         filter.addAction(packageName + Brick.BROADCAST_FILTER_MERCHANT)
         LocalBroadcastManager.getInstance(this).registerReceiver(brickReceiver, filter)
-        Log.d("MainActivity", "Brick receiver registered")
+        SmartLog.d("MainActivity", "Brick receiver registered")
     }
 
     private fun unregisterBrickReceiver() {
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(brickReceiver)
-            Log.d("MainActivity", "Brick receiver unregistered")
+            SmartLog.d("MainActivity", "Brick receiver unregistered")
         } catch (e: IllegalArgumentException) {
             // Receiver was not registered
-            Log.w("MainActivity", "Brick receiver was not registered")
+            SmartLog.w("MainActivity", "Brick receiver was not registered")
         }
     }
 
@@ -155,7 +172,7 @@ class MainActivity : ComponentActivity() {
     }
 
     fun processPayment(token: String, email: String) {
-        Log.d("MainActivity", "Processing payment for $email")
+        SmartLog.d("MainActivity", "Processing payment for $email")
         brickViewModel.processPayment(token, email)
     }
 
@@ -166,24 +183,17 @@ class MainActivity : ComponentActivity() {
         isProcessing = false
 
         if (resultCode == ResponseCode.SUCCESSFUL) {
-            Log.d("onActivityResult", "SUCCESSFUL")
             paymentStatus = PaymentStatus.Success("Payment completed successfully!")
             Toast.makeText(this, "SUCCESSFUL", Toast.LENGTH_SHORT).show()
-        }
-        else if (resultCode == ResponseCode.FAILED) {
-            Log.d("onActivityResult", "FAILED")
+        } else if (resultCode == ResponseCode.FAILED) {
             paymentStatus = PaymentStatus.Failed("Payment failed!")
             Toast.makeText(this, "FAILED", Toast.LENGTH_SHORT).show()
-        }
-        else if (resultCode == ResponseCode.CANCEL) {
-            Log.d("onActivityResult", "CANCELLED")
+        } else if (resultCode == ResponseCode.CANCEL) {
             paymentStatus = PaymentStatus.Cancelled("Payment cancelled!")
             Toast.makeText(this, "CANCELLED", Toast.LENGTH_SHORT).show()
-        }
-        else if (resultCode == ResponseCode.ERROR) {
-            Log.d("onActivityResult", "ERROR")
+        } else if (resultCode == ResponseCode.ERROR) {
             val error = data?.getStringExtra("error") as? String
-            paymentStatus = PaymentStatus.Unknown("An error occurred!\n"+ error)
+            paymentStatus = PaymentStatus.Unknown("An error occurred!\n" + error)
             Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show()
         }
     }
@@ -326,21 +336,25 @@ fun PaymentStatusCard(
             Color(0xFF2E7D32),
             Color(0xFF4CAF50)
         )
+
         is PaymentStatus.Processing -> Triple(
             Color(0xFFFF9800).copy(alpha = 0.1f),
             Color(0xFFE65100),
             Color(0xFFFF9800)
         )
+
         is PaymentStatus.Failed -> Triple(
             Color(0xFFF44336).copy(alpha = 0.1f),
             Color(0xFFC62828),
             Color(0xFFF44336)
         )
+
         is PaymentStatus.Cancelled -> Triple(
             Color(0xFF9E9E9E).copy(alpha = 0.1f),
             Color(0xFF424242),
             Color(0xFF9E9E9E)
         )
+
         is PaymentStatus.Unknown -> Triple(
             Color(0xFF9C27B0).copy(alpha = 0.1f),
             Color(0xFF6A1B9A),

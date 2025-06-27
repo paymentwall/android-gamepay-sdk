@@ -6,7 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+
+import com.paymentwall.pwunifiedsdk.util.SmartLog;
 
 /**
  * Created by nguyen.anh on 3/4/2016.
@@ -60,7 +61,7 @@ public class BrickLogoDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
-        Log.i("LOGO", "Drawing logo");
+        SmartLog.i("LOGO", "Drawing logo");
         //draw Path1
         pathP1.moveTo(h5_x * w, h5_y * h);
         pathP1.lineTo(h6_x * w, h6_y * h);

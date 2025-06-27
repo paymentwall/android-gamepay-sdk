@@ -15,7 +15,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -72,7 +71,6 @@ import java.util.Stack;
  */
 
 public class PaymentSelectionActivity extends FragmentActivity {
-
     public static final int REQUEST_CODE = 0x2505;
     public UnifiedRequest request;
     private LocalRequest message;
@@ -86,13 +84,10 @@ public class PaymentSelectionActivity extends FragmentActivity {
     public static String paymentError = "";
     private WebView webView;
     private final List<ExternalPs> _externalPsList = new ArrayList<>();
-
     protected Handler handler = new Handler();
-
     private Stack<Fragment> mStackFragments = new Stack<Fragment>();
 
     public Bundle bundle;
-
     private List<PayAltoCore.PayAltoMethod> listPaymentMethod = new ArrayList<>();
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -107,7 +102,6 @@ public class PaymentSelectionActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Fabric.with(this, new Crashlytics(), new Answers());
         PwUtils.logFabricCustom("Launch SDK");
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(getPackageName() + Brick.FILTER_BACK_PRESS_ACTIVITY));
@@ -145,36 +139,6 @@ public class PaymentSelectionActivity extends FragmentActivity {
                         | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
 
-    private void getLocalMethodsIfNeeded() {
-        // Initialize the core
-//        PayAltoCore core = PayAltoCore.getInstance();
-//        core.setContext(this);
-//
-//// Create request
-//        PayAltoCore.PaymentSystemsRequest r = new PayAltoCore.PaymentSystemsRequest("02e68a437754e67f46269bd6597ef5ba");
-
-// Make the call
-//        core.getPaymentSystems(r, new PayAltoCore.PaymentSystemsCallback() {
-//            @Override
-//            public void onPaymentSystemsSuccess(List<ExternalPs> paymentMethods) {
-//                if (paymentMethods.size() == 0) {
-//                    return;
-//                }
-//                _externalPsList = paymentMethods;
-//                for (ExternalPs ps : paymentMethods) {
-//                    request.add(ps);
-//                }
-//                bundle.putParcelable(Key.REQUEST_MESSAGE, request);
-//            }
-//
-//            @Override
-//            public void onPayAltoError(PayAltoCore.PayAltoError error) {
-//                // Handle error
-//                Log.e("Error", error.getMessage());
-//            }
-//        });
-    }
-
     private void acquireMessage() {
         //determine the number of payment options enabled by merchant
         bundle = getIntent().getExtras();
@@ -184,7 +148,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 message = (LocalRequest) request.getPayAltoRequest();
                 customParameters = (CustomRequest) request.getPayAltoRequest();
             } catch (Exception e) {
-                e.printStackTrace();
+                SmartLog.e(e.getMessage());
             }
 
             if (!request.isRequestValid()) {
@@ -209,34 +173,22 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 int resID = PwUtils.getLayoutId(this, "activity_payment_selection");
                 setContentView(resID);
                 initUI();
-//                getLocalMethodsIfNeeded();
             }
         }
     }
 
     private void initUI() {
         ivBack = findViewById(R.id.ivToolbarBack);
-        ivBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        ivBack.setOnClickListener(v -> onBackPressed());
         ivHelp = findViewById(R.id.ivHelp);
         ivHelp.setVisibility(View.GONE);
-        ivHelp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFeedbackDialog();
-            }
-        });
+        ivHelp.setOnClickListener(v -> showFeedbackDialog());
         tvActionBarTitle = findViewById(R.id.tvActionBarTitle);
         PwUtils.setFontBold(this, tvActionBarTitle);
 
         if (!request.isBrickEnabled() && !request.isMintEnabled() && !request.isMobiamoEnabled()) {
-            if (request.isPayAltoEnabled() || request.getExternalPsList().size() > 0) {
+            if (request.isPayAltoEnabled() || !request.getExternalPsList().isEmpty()) {
                 replaceContentFragment(MainFragment.getInstance(), bundle);
-//                replaceContentFragment(LocalPsFragment.getInstance(), bundle);
             } else {
                 setResult(ResponseCode.CANCEL);
                 finish();
@@ -307,7 +259,6 @@ public class PaymentSelectionActivity extends FragmentActivity {
         if (requestCode == PayAltoActivity.REQUEST_CODE) {
             if (resultCode == ResponseCode.ERROR) {
                 setResult(ResponseCode.ERROR, data);
-                //finish();
             } else if (resultCode == ResponseCode.FAILED) {
                 setResult(ResponseCode.FAILED, data);
                 finish();
@@ -408,7 +359,6 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         View view = getCurrentFocus();
         if (view != null) {
-//            view.clearFocus();
             inputManager.hideSoftInputFromWindow(view.getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }
@@ -432,23 +382,17 @@ public class PaymentSelectionActivity extends FragmentActivity {
     public void displayPaymentSucceeded() {
         if (isWaitLayoutShowing) {
             isWaitLayoutShowing = false;
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setResult(ResponseCode.SUCCESSFUL);
-                    finish();
-                }
+            handler.postDelayed(() -> {
+                setResult(ResponseCode.SUCCESSFUL);
+                finish();
             }, 2000);
             isSuccessfulShowing = true;
 
         } else {
 
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setResult(ResponseCode.SUCCESSFUL);
-                    finish();
-                }
+            handler.postDelayed(() -> {
+                setResult(ResponseCode.SUCCESSFUL);
+                finish();
             }, 2000);
             isSuccessfulShowing = true;
         }
@@ -488,7 +432,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 transaction.replace(R.id.main_frame, fragment);
                 transaction.commit();
             }
-            Log.d(this.getClass().getSimpleName(), "stackTabFragments:" + mStackFragments);
+            SmartLog.d(this.getClass().getSimpleName(), "stackTabFragments:" + mStackFragments);
         }
     }
 
@@ -504,7 +448,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 }
             }
             mStackFragments = newStack;
-            Log.d(this.getClass().getSimpleName(), "validateStack - stackTabFragments:" + mStackFragments);
+            SmartLog.d(this.getClass().getSimpleName(), "validateStack - stackTabFragments:" + mStackFragments);
         }
     }
 
@@ -519,7 +463,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
                 }
             }
             mStackFragments = newStack;
-            Log.d(this.getClass().getSimpleName(), "validateStack - stackTabFragments:" + mStackFragments);
+            SmartLog.d(this.getClass().getSimpleName(), "validateStack - stackTabFragments:" + mStackFragments);
         }
     }
 
@@ -604,7 +548,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.i("On new intent", intent.toString());
+        SmartLog.i("On new intent", intent.toString());
         LocalPsFragment.getInstance().onNewIntent(intent);
     }
 
@@ -613,44 +557,30 @@ public class PaymentSelectionActivity extends FragmentActivity {
 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.saas_dialog_feedback);
-//        dialog.getWindow().setBackgroundDrawableResource(
-//                android.R.color.transparent);
         dialog.setCancelable(true);
 
         dialog.show();
     }
 
     public void show3dsWebView(String url) {
-//        initWebView();
         webView.setVisibility(View.VISIBLE);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.addJavascriptInterface(this, "HTMLOUT");
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setBuiltInZoomControls(true);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
-//        }
         CookieManager.getInstance().setAcceptCookie(true);
         webView.setWebChromeClient(new WebChromeClient());
-//        webView.getSettings().setUserAgentString("fasterpay");
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(final WebView view, final String url) {
-                Log.i("URL Redirecting", url);
-//                view.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                    }
-//                }, 1000);
-
+                SmartLog.i("URL Redirecting", url);
                 return false;
             }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                Log.i("WEB_VIEW_TEST", "onPageStarted" + url);
-//                super.onPageStarted(view, url, favicon);
+                SmartLog.i("WEB_VIEW_TEST", "onPageStarted" + url);
             }
 
             @Override
@@ -660,7 +590,7 @@ public class PaymentSelectionActivity extends FragmentActivity {
 
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-//                Log.i("REQUEST", request.getRequestHeaders() + "");
+                SmartLog.i("REQUEST", request.getRequestHeaders() + "");
                 return null;
             }
         });
@@ -668,12 +598,9 @@ public class PaymentSelectionActivity extends FragmentActivity {
     }
 
     public void hide3dsWebview() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                webView.loadUrl("about:blank");
-                webView.setVisibility(View.GONE);
-            }
+        runOnUiThread(() -> {
+            webView.loadUrl("about:blank");
+            webView.setVisibility(View.GONE);
         });
     }
 
@@ -681,33 +608,21 @@ public class PaymentSelectionActivity extends FragmentActivity {
     public void processHTML(String html) {
         if (html == null)
             return;
-//        Log.i("HTML", html);
         try {
             Document doc = Jsoup.parse(html);
             Element body = doc.select("body").first();
-            Log.i("BODY", body.text());
+            SmartLog.i("BODY", body.text());
             if (body.text().equalsIgnoreCase("")) return;
 
             JSONObject obj = new JSONObject(body.text());
             if (obj.has("object") && obj.getString("object").equalsIgnoreCase("charge")) {
                 final String permanentToken = obj.getJSONObject("card").getString("token");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        BrickFragment.getInstance().onChargeSuccess(permanentToken);
-                        BrickNewFragment.getInstance().onChargeSuccess(permanentToken);
-                    }
-                });
+                runOnUiThread(() -> BrickNewFragment.getInstance().onChargeSuccess(permanentToken));
                 return;
             }
             if (obj.has("type") && obj.getString("type").equalsIgnoreCase("error")) {
                 final String error = obj.getString("error");
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        BrickNewFragment.getInstance().onChargeFailed(error);
-                    }
-                });
+                runOnUiThread(() -> BrickNewFragment.getInstance().onChargeFailed(error));
             }
 
         } catch (Exception e) {
@@ -725,18 +640,18 @@ public class PaymentSelectionActivity extends FragmentActivity {
     }
 
     public void onPaymentSuccessful() {
-        Log.i("OnPaymentSuccessful", "successful");
+        SmartLog.i("OnPaymentSuccessful", "successful");
         setResult(ResponseCode.SUCCESSFUL);
         finish();
     }
 
     public void onPaymentError() {
-        Log.i("OnPaymentError", "error");
+        SmartLog.i("OnPaymentError", "error");
         Toast.makeText(this, "Payment Error", Toast.LENGTH_SHORT).show();
     }
 
     public void onPaymentCancel() {
-        Log.i("OnPaymentCancel", "Cancel");
+        SmartLog.i("OnPaymentCancel", "Cancel");
         Toast.makeText(this, "Payment cancelled", Toast.LENGTH_SHORT).show();
     }
 }

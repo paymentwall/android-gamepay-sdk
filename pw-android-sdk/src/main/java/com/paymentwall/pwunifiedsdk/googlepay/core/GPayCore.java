@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class GPayCore {
+    public static final String TAG = "GPayCore";
     private static final int CONNECTION_TIMEOUT = 30000;
     private static final int READ_TIMEOUT = 30000;
     private static final String INSTRUCTION_URL = PWEnv.GOOGLE_PAY_INSTRUCTION_URL;
@@ -191,18 +192,14 @@ public class GPayCore {
                         // Extract merchant info
                         _merchantInfo = googlePayValue.getJSONObject("merchant_info");
 
-                        SmartLog.d("GooglePay", "ClickID: " + clickID);
-                        SmartLog.d("GooglePay", "Session: " + _sessionKey);
-                        SmartLog.d("GooglePay", "Gateway Merchant ID: " + _gatewayMerchantId);
-                        SmartLog.d("GooglePay", "Merchant Info: " + _merchantInfo.toString());
-
+                        SmartLog.d(TAG, "ClickID: " + clickID);
                         break;
                     }
                 }
 
                 return clickID;
             } catch (JSONException e) {
-                throw new GooglePayError("Failed to generate click ID", GooglePayError.Kind.API_ERROR);
+                throw new GooglePayError("Failed to get GooglePay Instruction", GooglePayError.Kind.API_ERROR);
             }
 
         } catch (Exception e) {
@@ -247,7 +244,7 @@ public class GPayCore {
             String urlString = String.format("%s?key=%s&uid=%s&skey=%s&ref=%s",
                     PAYMENT_URL, key, uid, skey, ref);
             URL url = new URL(urlString);
-            Log.d("GPAY: Request URL", url.toString());
+//            SmartLog.d("GPAY: Request URL", url.toString());
             HttpURLConnection conn = createPostRequest(url, queryUrl, new HashMap<>());
 //            conn.setRequestProperty("Accept", "*/*");
 //            conn.setRequestProperty("Accept-Language", "en-US,en;q=0.9");
@@ -259,7 +256,7 @@ public class GPayCore {
             if (jsonResponse.has("success") && jsonResponse.getInt("success") == 1) {
                 return jsonResponse.toString();
             } else {
-                Log.d("GPAY: Response", jsonResponse.toString());
+//                SmartLog.d("GPAY: Response", jsonResponse.toString());
                 String errMsg = "Payment processing failed";
                 if (jsonResponse.has("error")) {
                     errMsg = jsonResponse.getJSONArray("error").getString(0);
@@ -285,7 +282,7 @@ public class GPayCore {
         } catch (IOException e) {
             throw new GooglePayError("Cannot open connection", GooglePayError.Kind.NETWORK);
         }
-        Log.d("GPAY: Request raw-data", queryUrl);
+//        SmartLog.d("GPAY: Request raw-data", queryUrl);
 
         conn.setConnectTimeout(connectionTimeout);
         conn.setReadTimeout(readTimeout);
