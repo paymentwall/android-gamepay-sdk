@@ -33,7 +33,7 @@ Add the following dependency to your `app/build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'com.terminal3:gamepaysdk:1.0.1'
+    implementation 'com.terminal3:gamepaysdk:1.0.2'
 }
 ```
 
@@ -118,12 +118,11 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
 
             ResponseCode.ERROR -> {
                 isProcessing = false
-                paymentStatus = PaymentStatus.Unknown("An error occurred!")
+                val errMessage = resp.data.getStringExtra("error_message") ?: "An error occurred!"
+                paymentStatus = PaymentStatus.Unknown(errMessage)
             }
 
             ResponseCode.MERCHANT_PROCESSING -> {
-                isProcessing = false
-
                 val serviceType = resp.data.getStringExtra(GPApi.KEY_SERVICE_TYPE) ?: ""
 
                 if (GPApi.SERVICE_TYPE_BRICK == serviceType) {
