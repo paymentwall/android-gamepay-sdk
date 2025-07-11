@@ -12,7 +12,7 @@ object Constants {
     const val PW_PROJECT_KEY = "";
     const val PW_SECRET_KEY = ""; // Should be get from merchant's server
 
-    const val USER_ID: String = "12311111001233123"
+    const val USER_ID: String = "12345"
     const val ITEM_GEM_ID: String = "gem0001"
     const val USER_EMAIL: String = "user_123@gmail.com"
     const val ITEM_NAME: String = "GEM"

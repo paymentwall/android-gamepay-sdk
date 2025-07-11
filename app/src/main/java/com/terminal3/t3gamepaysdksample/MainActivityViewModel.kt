@@ -15,7 +15,6 @@ import com.terminal3.gamepaysdk.brick.core.BrickHelper
 import com.terminal3.gamepaysdk.core.UnifiedRequest
 import com.terminal3.gamepaysdk.payalto.utils.Const
 import com.terminal3.gamepaysdk.util.ResponseCode
-import com.terminal3.gamepaysdk.util.SmartLog
 import com.terminal3.t3gamepaysdksample.config.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,7 +59,6 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
     }
 
     fun createPaymentRequest(): UnifiedRequest {
-        SmartLog.DEBUG = true
         isProcessing = true
         val request = UnifiedRequest()
         request.pwProjectKey = Constants.PW_PROJECT_KEY
@@ -107,12 +105,11 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
 
             ResponseCode.ERROR -> {
                 isProcessing = false
-                paymentStatus = PaymentStatus.Unknown("An error occurred!")
+                val errMessage = resp.data.getStringExtra("error_message") ?: "An error occurred!"
+                paymentStatus = PaymentStatus.Unknown(errMessage)
             }
 
             ResponseCode.MERCHANT_PROCESSING -> {
-                isProcessing = false
-
                 val serviceType = resp.data.getStringExtra(GPApi.KEY_SERVICE_TYPE) ?: ""
 
                 if (GPApi.SERVICE_TYPE_BRICK == serviceType) {
