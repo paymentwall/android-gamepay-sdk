@@ -1,6 +1,10 @@
 package com.terminal3.t3gamepaysdksample.config
 
 object Constants {
+    // Deep link URL used to redirect the user back to the app
+    // after completing the payment in an external browser or app.
+    // This must match the <data android:scheme="..." android:host="..."/>
+    // you declare in AndroidManifest.xml for PaymentSelectionActivity.
     const val CLIENT_RETURN_URL = "gpdemo://gamepay-redirect"
 
     // Endpoint on the merchant's server that make a charge requests to Brick API.
