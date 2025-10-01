@@ -16,6 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://registry-sdk.terminal3.com/repository/maven-public/"
+        }
     }
 }
 

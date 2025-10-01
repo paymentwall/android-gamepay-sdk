@@ -1,6 +1,7 @@
 package com.terminal3.t3gamepaysdksample
 
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +15,7 @@ import com.terminal3.gamepaysdk.IGPAPIEventHandler
 import com.terminal3.gamepaysdk.brick.core.BrickHelper
 import com.terminal3.gamepaysdk.core.UnifiedRequest
 import com.terminal3.gamepaysdk.payalto.utils.Const
+import com.terminal3.gamepaysdk.payalto.utils.PayAltoMiscUtils
 import com.terminal3.gamepaysdk.util.ResponseCode
 import com.terminal3.t3gamepaysdksample.config.Constants
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +54,7 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
     var uid by mutableStateOf<String>(Constants.USER_ID)
     var chargeAmount by mutableStateOf<Double>(0.3)
     var chargeCurrency by mutableStateOf<String>("USD")
-    var country by mutableStateOf<String>("KR")
+    var country by mutableStateOf<String>("US")
 
     init {
         GPApi.setEventHandler(this)
@@ -61,26 +63,30 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
     fun createPaymentRequest(): UnifiedRequest {
         isProcessing = true
         val request = UnifiedRequest()
+        // Configure project keys
         request.pwProjectKey = Constants.PW_PROJECT_KEY
         request.pwSecretKey = Constants.PW_SECRET_KEY
 
+        // Configure merchant details
+        request.merchantName = Constants.MERCHANT_NAME
+        request.merchantTermsOfServiceURL = Constants.TERMS_OF_SERVICE_URL
+        request.merchantPrivacyPolicyURL = Constants.PRIVACY_POLICY_URL
+        request.returnUrl = Constants.CLIENT_RETURN_URL
+
+        // Configure payment request
         request.amount = chargeAmount
         request.currency = chargeCurrency
         request.userId = uid
         request.userEmail = Constants.USER_EMAIL
         request.itemId = Constants.ITEM_GEM_ID
         request.itemName = Constants.ITEM_NAME
-        request.merchantName = Constants.MERCHANT_NAME
+        request.countryCode = country
         request.timeout = 30000
         request.signVersion = 3
 
-        request.addBrick()
-        request.enableFooter()
-        request.addGooglePay()
-
-        request.addPayAlto()
-        request.addPayAltoParams(Const.P.WIDGET, "t3_1")
-        request.addPayAltoParams(Const.P.COUNTRY_CODE, country)
+        // Add custom parameters
+        request.addCustomParam("referral_code", "AUB8712364")
+        request.addCustomParam("history_id", "87782627")
 
         return request
     }
@@ -113,12 +119,43 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
                 val serviceType = resp.data.getStringExtra(GPApi.KEY_SERVICE_TYPE) ?: ""
 
                 if (GPApi.SERVICE_TYPE_BRICK == serviceType) {
-                    val email = resp.data.getStringExtra(GPApi.KEY_BRICK_EMAIL) ?: ""
                     val token = resp.data.getStringExtra(GPApi.KEY_BRICK_TOKEN) ?: ""
+                    val amount = resp.data.getDoubleExtra(GPApi.KEY_BRICK_CHARGE_AMOUNT, chargeAmount);
+                    val currency = resp.data.getStringExtra(GPApi.KEY_BRICK_CHARGE_CURRENCY) ?: chargeCurrency
+
+                    val email = resp.data.getStringExtra(GPApi.KEY_BRICK_EMAIL) ?: ""
+                    val firstName = resp.data.getStringExtra(GPApi.KEY_BRICK_CARD_HOLDER_FIRST_NAME) ?: "";
+                    val lastName = resp.data.getStringExtra(GPApi.KEY_BRICK_CARD_HOLDER_LAST_NAME) ?: "";
+
+                    val refId = resp.data.getStringExtra(GPApi.KEY_BRICK_REF_ID) ?: "";
+                    val chargeId = resp.data.getStringExtra(GPApi.KEY_BRICK_CHARGE_ID) ?: "";
+                    val brickSercureToken = resp.data.getStringExtra(GPApi.KEY_BRICK_SECURE_TOKEN) ?: "";
+
+                    val customParamsBundle = resp.data.getBundleExtra(GPApi.KEY_CUSTOM_PARAMS) ?: Bundle()
+                    val referralCode = customParamsBundle.getString("referral_code") ?: ""
+                    val historyId = customParamsBundle.getString("history_id") ?: ""
+                    val customParams = mapOf(
+                        "referral_code" to referralCode,
+                        "history_id" to historyId
+                    )
+
+                    Log.i("CHARGE_AMOUNT", amount.toString())
+                    Log.i("CHARGE_CURRENCY", currency)
+                    Log.i("CUSTOM_EMAIL", email ?: "")
+                    Log.i("CUSTOM_TOKEN", token ?: "")
+                    Log.i("CUSTOM_FIRST_NAME", firstName ?: "")
+                    Log.i("CUSTOM_LAST_NAME", lastName ?: "")
+                    Log.i("CUSTOM_REF_ID", refId ?: "")
+                    Log.i("CUSTOM_CHARGE_ID", chargeId ?: "")
+                    Log.i("CUSTOM_SECURE_TOKEN", brickSercureToken ?: "")
+                    Log.i("CUSTOM_REFERRAL_CODE", referralCode ?: "")
+                    Log.i("CUSTOM_HISTORY_ID", historyId ?: "")
 
                     // Process the payment with current charge details
                     if (token.isNotEmpty() && email.isNotEmpty()) {
-                        processPayment(token, email)
+                        processPayment(token, amount, currency, firstName, lastName,
+                            email, refId, chargeId, brickSercureToken,
+                            customParams)
                     } else {
                         paymentStatus = PaymentStatus.Unknown("Invalid payment data received")
                     }
@@ -127,15 +164,20 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
         }
     }
 
-    fun processPayment(token: String, email: String) {
+    fun processPayment(token: String, amount: Double, currency: String, firstName: String, lastName: String,
+                       email: String, refId: String = "", chargeId: String = "", secureToken: String = "",
+                       customParams: Map<String, String>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                charge(token, email, chargeAmount, chargeCurrency)
+                charge(token, firstName, lastName, email, amount, currency, refId, chargeId, secureToken, customParams)
             }
         }
     }
 
-    private fun charge(token: String, email: String, amount: Double, currency: String) {
+    private fun charge(token: String, firstName: String, lastName: String,
+                       email: String, amount: Double, currency: String,
+                       refId: String, chargeId: String, secureToken: String,
+                       customParams: Map<String, String>) {
         // Prepare SSL
         var originalDNSCacheTTL: String? = null
         var allowedToSetTTL = true
@@ -157,6 +199,27 @@ class MainActivityViewModel : ViewModel(), IGPAPIEventHandler {
                 put("amount", amountStr)
                 put("currency", currency)
                 put("secure_return_method", "url")
+                put("secretKey", Constants.PW_SECRET_KEY)
+                if (firstName.isNotBlank()) {
+                    put("firstname", firstName)
+                }
+                if (lastName.isNotBlank()) {
+                    put("lastname", lastName)
+                }
+                if (refId.isNotBlank()) {
+                    put("reference_id", refId)
+                }
+                if (chargeId.isNotBlank()) {
+                    put("brick_charge_id", chargeId)
+                }
+                if (secureToken.isNotBlank()) {
+                    put("brick_secure_token", secureToken)
+                }
+                customParams.forEach { (key, value) ->
+                    put(key, value)
+                }
+//                put("env", "staging")
+                put("env", Constants.SERVER_ENV)
             }
 
             val secureRedirectUrl = "${Constants.THREE_DS_RETURN_URL}/index?token=$token&email=$email&amount=$amountStr&currency=$currency"

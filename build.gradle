@@ -4,3 +4,183 @@ alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
 }
+
+task cleanSpecificDependencies {
+    group = 'cleanup'
+    description = 'Clean specific dependencies from cache'
+
+    doLast {
+        def dependenciesToClean = [
+                'com.github.paymentwall:android-gamepay-sdk-core-ui:0.0.50',
+                'com.facebook.shimmer:shimmer:0.5.0',
+                'com.github.corouteam:GlideToVectorYou:v2.0.0',
+                'org.jfrog.cardinalcommerce.gradle:cardinalmobilesdk:2.2.7-5'
+        ]
+
+        // Function to check if dependency exists in cache
+        def checkDependencyExists = { dep ->
+            def (group, artifact, version) = dep.split(':')
+            def cacheBase = "${System.getProperty('user.home')}/.gradle/caches"
+            def foundFiles = []
+
+            // Check modules cache
+            def modulesPath = "${cacheBase}/modules-2/files-2.1/${group}/${artifact}/${version}"
+            def modulesDir = file(modulesPath)
+            if (modulesDir.exists()) {
+                foundFiles.add("modules: ${modulesPath}")
+            }
+
+            // Check transforms (broader search)
+            def transformsDirs = fileTree(cacheBase) {
+                include '**/transforms-*/**'
+                include "**/*${artifact}*"
+            }
+            transformsDirs.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    foundFiles.add("transform: ${file.absolutePath}")
+                }
+            }
+
+            // Check metadata
+            def metadataFiles = fileTree("${cacheBase}/modules-2") {
+                include '**/metadata-*/**'
+                include "**/*${artifact}*"
+            }
+            metadataFiles.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    foundFiles.add("metadata: ${file.absolutePath}")
+                }
+            }
+
+            // Check artifacts cache
+            def artifactDirs = fileTree(cacheBase) {
+                include '**/artifacts-*/**'
+                include "**/*${artifact}*"
+            }
+            artifactDirs.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    foundFiles.add("artifacts: ${file.absolutePath}")
+                }
+            }
+
+            // Check jars cache
+            def jarDirs = fileTree(cacheBase) {
+                include '**/jars-*/**'
+                include "**/*${artifact}*"
+            }
+            jarDirs.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    foundFiles.add("jars: ${file.absolutePath}")
+                }
+            }
+
+            return foundFiles
+        }
+
+        // Pre-cleanup verification
+        println "\n🔍 Pre-cleanup verification:"
+        def preCleanupStatus = [:]
+        dependenciesToClean.each { dep ->
+            def foundFiles = checkDependencyExists(dep)
+            preCleanupStatus[dep] = foundFiles
+            println "  📦 $dep: ${foundFiles.size()} cache entries found"
+        }
+
+        println "\n🧹 Starting cleanup process..."
+
+        dependenciesToClean.each { dep ->
+            println "\n🧹 Cleaning: $dep"
+
+            def (group, artifact, version) = dep.split(':')
+            def cacheBase = "${System.getProperty('user.home')}/.gradle/caches"
+
+            // Clean modules cache
+            def modulesPath = "${cacheBase}/modules-2/files-2.1/${group}/${artifact}/${version}"
+            def modulesDir = file(modulesPath)
+            if (modulesDir.exists()) {
+                println "  📁 Removing modules: $modulesPath"
+                delete modulesDir
+            } else {
+                println "  ⚠️  Modules not found: $modulesPath"
+            }
+
+            // Clean transforms
+            def transformsDirs = fileTree(cacheBase) {
+                include '**/transforms-*/**'
+                include "**/*${artifact}*"
+            }
+            transformsDirs.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    println "  🔄 Removing transform: ${file.absolutePath}"
+                    delete file
+                }
+            }
+
+            // Clean metadata
+            def metadataFiles = fileTree("${cacheBase}/modules-2") {
+                include '**/metadata-*/**'
+                include "**/*${artifact}*"
+            }
+            metadataFiles.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    println "  📊 Removing metadata: ${file.absolutePath}"
+                    delete file
+                }
+            }
+
+            // Clean artifacts cache
+            def artifactFiles = fileTree(cacheBase) {
+                include '**/artifacts-*/**'
+                include "**/*${artifact}*"
+            }
+            artifactFiles.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    println "  📦 Removing artifacts: ${file.absolutePath}"
+                    delete file
+                }
+            }
+
+            // Clean jars cache
+            def jarFiles = fileTree(cacheBase) {
+                include '**/jars-*/**'
+                include "**/*${artifact}*"
+            }
+            jarFiles.each { file ->
+                if (file.absolutePath.contains(artifact)) {
+                    println "  🏺 Removing jars: ${file.absolutePath}"
+                    delete file
+                }
+            }
+        }
+
+        println "\n🔍 Post-cleanup verification:"
+        def allCleanedSuccessfully = true
+
+        dependenciesToClean.each { dep ->
+            def remainingFiles = checkDependencyExists(dep)
+            def preCount = preCleanupStatus[dep].size()
+            def postCount = remainingFiles.size()
+
+            if (remainingFiles.isEmpty()) {
+                println "  ✅ $dep: Completely removed (was: $preCount, now: 0)"
+            } else {
+                println "  ❌ $dep: ${remainingFiles.size()} files still remain (was: $preCount, now: $postCount)"
+                remainingFiles.each { file ->
+                    println "    📄 Remaining: $file"
+                }
+                allCleanedSuccessfully = false
+            }
+        }
+
+        println "\n" + ("=" * 60)
+        if (allCleanedSuccessfully) {
+            println "✅ SUCCESS: All specified dependencies completely removed from cache!"
+        } else {
+            println "⚠️  WARNING: Some dependency files could not be removed"
+            println "   This might be due to files being in use or permission issues"
+            println "   Try stopping any running Gradle daemons with: ./gradlew --stop"
+        }
+        println "Run: ./gradlew build --refresh-dependencies to download fresh copies"
+        println "=" * 60
+    }
+}

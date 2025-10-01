@@ -3,9 +3,7 @@
 
     <style name="Theme.T3GamePaySDKSample" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="MyCustomTheme" parent="@style/PaymentwallSDKTheme">
-        <item name="merchantTermsUrl">https://merchant.com/terms</item>
-        <item name="merchantPrivacyUrl">https://merchant.com/privacy</item>
+    <style name="MyCustomTheme" parent="Theme.GamePaySDK">
     </style>
 
 </resources>
