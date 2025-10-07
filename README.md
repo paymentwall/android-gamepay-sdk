@@ -33,7 +33,7 @@ Add the following dependency to your `app/build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'com.terminal3:gamepaysdk:1.2.0'
+    implementation 'com.terminal3:gamepaysdk:1.2.1'
 }
 ```
 
